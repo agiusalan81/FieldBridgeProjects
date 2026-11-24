@@ -5,6 +5,7 @@ import { StatusBadge } from "@/components/fb/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { db, useTable, useRefresh, eur, finalAccount } from "@/lib/db";
 import { pageHead } from "@/lib/head";
+import { PaymentApplications } from "@/components/fb/PaymentApplications";
 
 export const Route = createFileRoute("/commercials")({
   head: () => pageHead("Commercials & Variations", "Contract sum, approved variations, anticipated final account and extension of time tracking."),
@@ -60,6 +61,7 @@ function Commercials() {
           </tbody>
         </table>
       </div>
+      <PaymentApplications projectId={p?.id} />
       <h2 className="mb-2 mt-6 font-display text-xl font-bold uppercase">Trade Package Subcontract Values</h2>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {pkgs.data?.map((k) => <div key={k.id} className="rounded-md border bg-card p-3"><div className="font-mono text-xs text-muted-foreground">{k.package_code}</div><div className="font-medium">{k.package_name}</div><div className="font-display text-xl font-bold">{eur(k.subcontract_value)}</div></div>)}

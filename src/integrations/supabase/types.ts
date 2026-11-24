@@ -218,6 +218,68 @@ export type Database = {
           },
         ]
       }
+      payment_applications: {
+        Row: {
+          application_number: number
+          approved_variations: number
+          books_reference: string | null
+          books_sync_status: string
+          created_at: string
+          gross_work_value: number
+          id: string
+          period_end: string
+          platform_fee_bps: number
+          platform_fixed_fee: number
+          previous_certified: number
+          project_id: string
+          retention_percent: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          application_number: number
+          approved_variations?: number
+          books_reference?: string | null
+          books_sync_status?: string
+          created_at?: string
+          gross_work_value?: number
+          id?: string
+          period_end: string
+          platform_fee_bps?: number
+          platform_fixed_fee?: number
+          previous_certified?: number
+          project_id: string
+          retention_percent?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          application_number?: number
+          approved_variations?: number
+          books_reference?: string | null
+          books_sync_status?: string
+          created_at?: string
+          gross_work_value?: number
+          id?: string
+          period_end?: string
+          platform_fee_bps?: number
+          platform_fixed_fee?: number
+          previous_certified?: number
+          project_id?: string
+          retention_percent?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_applications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_levels_zones: {
         Row: {
           created_at: string

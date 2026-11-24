@@ -30,3 +30,4 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - FieldBridge data access goes through `src/lib/db.ts` (`useTable` + untyped `db` client) so screens stay simple while the demo has no sign-in; RLS currently allows public read/insert/update for demo use — tighten when auth is added.
+- Valuation and platform-fee maths live in `valuation()` in `src/lib/db.ts` (tested); UI only renders it, so fee rules have one source.

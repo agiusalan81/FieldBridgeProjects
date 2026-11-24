@@ -42,3 +42,16 @@ export function finalAccount(original: number, variations: Row[]) {
   const approved = variations.filter((v) => v.status === "Approved").reduce((s, v) => s + Number(v.approved_employer_amount ?? 0), 0);
   return { approved, total: Number(original) + approved };
 }
+
+/** Interim valuation: cumulative gross less retention less previously certified = due this period.
+ *  Platform fee = fixed monthly licence + basis points (1 bp = 0.01%) on the amount certified this period. */
+export function valuation(a: { gross_work_value: number; approved_variations: number; retention_percent: number; previous_certified: number; platform_fee_bps: number; platform_fixed_fee: number }) {
+  const r2 = (n: number) => Math.round(n * 100) / 100;
+  const gross = Number(a.gross_work_value) + Number(a.approved_variations);
+  const retention = r2(gross * Number(a.retention_percent) / 100);
+  const netCumulative = r2(gross - retention);
+  const dueThisPeriod = r2(Math.max(0, netCumulative - Number(a.previous_certified)));
+  const residualFee = r2(dueThisPeriod * Number(a.platform_fee_bps) / 10000);
+  const platformFee = r2(Number(a.platform_fixed_fee) + residualFee);
+  return { gross, retention, netCumulative, dueThisPeriod, residualFee, platformFee };
+}
