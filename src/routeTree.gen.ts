@@ -9,180 +9,248 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AddonsRouteImport } from './routes/addons'
-import { Route as CommercialsRouteImport } from './routes/commercials'
-import { Route as DrawingsRouteImport } from './routes/drawings'
-import { Route as ReturnsRouteImport } from './routes/returns'
-import { Route as RfisRouteImport } from './routes/rfis'
-import { Route as SnagsRouteImport } from './routes/snags'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAddonsRouteImport } from './routes/_authenticated/addons'
+import { Route as AuthenticatedCommercialsRouteImport } from './routes/_authenticated/commercials'
+import { Route as AuthenticatedDayworkRouteImport } from './routes/_authenticated/daywork'
+import { Route as AuthenticatedDrawingsRouteImport } from './routes/_authenticated/drawings'
+import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
+import { Route as AuthenticatedRfisRouteImport } from './routes/_authenticated/rfis'
+import { Route as AuthenticatedSnagsRouteImport } from './routes/_authenticated/snags'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AddonsRoute = AddonsRouteImport.update({
+const AuthenticatedAddonsRoute = AuthenticatedAddonsRouteImport.update({
   id: '/addons',
   path: '/addons',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const CommercialsRoute = CommercialsRouteImport.update({
-  id: '/commercials',
-  path: '/commercials',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedCommercialsRoute =
+  AuthenticatedCommercialsRouteImport.update({
+    id: '/commercials',
+    path: '/commercials',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDayworkRoute = AuthenticatedDayworkRouteImport.update({
+  id: '/daywork',
+  path: '/daywork',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const DrawingsRoute = DrawingsRouteImport.update({
+const AuthenticatedDrawingsRoute = AuthenticatedDrawingsRouteImport.update({
   id: '/drawings',
   path: '/drawings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ReturnsRoute = ReturnsRouteImport.update({
+const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const RfisRoute = RfisRouteImport.update({
+const AuthenticatedRfisRoute = AuthenticatedRfisRouteImport.update({
   id: '/rfis',
   path: '/rfis',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const SnagsRoute = SnagsRouteImport.update({
+const AuthenticatedSnagsRoute = AuthenticatedSnagsRouteImport.update({
   id: '/snags',
   path: '/snags',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/addons': typeof AddonsRoute
-  '/commercials': typeof CommercialsRoute
-  '/drawings': typeof DrawingsRoute
-  '/returns': typeof ReturnsRoute
-  '/rfis': typeof RfisRoute
-  '/snags': typeof SnagsRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/addons': typeof AuthenticatedAddonsRoute
+  '/commercials': typeof AuthenticatedCommercialsRoute
+  '/daywork': typeof AuthenticatedDayworkRoute
+  '/drawings': typeof AuthenticatedDrawingsRoute
+  '/returns': typeof AuthenticatedReturnsRoute
+  '/rfis': typeof AuthenticatedRfisRoute
+  '/snags': typeof AuthenticatedSnagsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/addons': typeof AddonsRoute
-  '/commercials': typeof CommercialsRoute
-  '/drawings': typeof DrawingsRoute
-  '/returns': typeof ReturnsRoute
-  '/rfis': typeof RfisRoute
-  '/snags': typeof SnagsRoute
+  '/auth': typeof AuthRoute
+  '/addons': typeof AuthenticatedAddonsRoute
+  '/commercials': typeof AuthenticatedCommercialsRoute
+  '/daywork': typeof AuthenticatedDayworkRoute
+  '/drawings': typeof AuthenticatedDrawingsRoute
+  '/returns': typeof AuthenticatedReturnsRoute
+  '/rfis': typeof AuthenticatedRfisRoute
+  '/snags': typeof AuthenticatedSnagsRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/addons': typeof AddonsRoute
-  '/commercials': typeof CommercialsRoute
-  '/drawings': typeof DrawingsRoute
-  '/returns': typeof ReturnsRoute
-  '/rfis': typeof RfisRoute
-  '/snags': typeof SnagsRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/addons': typeof AuthenticatedAddonsRoute
+  '/_authenticated/commercials': typeof AuthenticatedCommercialsRoute
+  '/_authenticated/daywork': typeof AuthenticatedDayworkRoute
+  '/_authenticated/drawings': typeof AuthenticatedDrawingsRoute
+  '/_authenticated/returns': typeof AuthenticatedReturnsRoute
+  '/_authenticated/rfis': typeof AuthenticatedRfisRoute
+  '/_authenticated/snags': typeof AuthenticatedSnagsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/addons'
     | '/commercials'
+    | '/daywork'
     | '/drawings'
     | '/returns'
     | '/rfis'
     | '/snags'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/auth'
     | '/addons'
     | '/commercials'
+    | '/daywork'
     | '/drawings'
     | '/returns'
     | '/rfis'
     | '/snags'
+    | '/'
   id:
     | '__root__'
-    | '/'
-    | '/addons'
-    | '/commercials'
-    | '/drawings'
-    | '/returns'
-    | '/rfis'
-    | '/snags'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/addons'
+    | '/_authenticated/commercials'
+    | '/_authenticated/daywork'
+    | '/_authenticated/drawings'
+    | '/_authenticated/returns'
+    | '/_authenticated/rfis'
+    | '/_authenticated/snags'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AddonsRoute: typeof AddonsRoute
-  CommercialsRoute: typeof CommercialsRoute
-  DrawingsRoute: typeof DrawingsRoute
-  ReturnsRoute: typeof ReturnsRoute
-  RfisRoute: typeof RfisRoute
-  SnagsRoute: typeof SnagsRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/addons': {
-      id: '/addons'
+    '/_authenticated/addons': {
+      id: '/_authenticated/addons'
       path: '/addons'
       fullPath: '/addons'
-      preLoaderRoute: typeof AddonsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAddonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/commercials': {
-      id: '/commercials'
+    '/_authenticated/commercials': {
+      id: '/_authenticated/commercials'
       path: '/commercials'
       fullPath: '/commercials'
-      preLoaderRoute: typeof CommercialsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedCommercialsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/drawings': {
-      id: '/drawings'
+    '/_authenticated/daywork': {
+      id: '/_authenticated/daywork'
+      path: '/daywork'
+      fullPath: '/daywork'
+      preLoaderRoute: typeof AuthenticatedDayworkRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/drawings': {
+      id: '/_authenticated/drawings'
       path: '/drawings'
       fullPath: '/drawings'
-      preLoaderRoute: typeof DrawingsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedDrawingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/returns': {
-      id: '/returns'
+    '/_authenticated/returns': {
+      id: '/_authenticated/returns'
       path: '/returns'
       fullPath: '/returns'
-      preLoaderRoute: typeof ReturnsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedReturnsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/rfis': {
-      id: '/rfis'
+    '/_authenticated/rfis': {
+      id: '/_authenticated/rfis'
       path: '/rfis'
       fullPath: '/rfis'
-      preLoaderRoute: typeof RfisRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedRfisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/snags': {
-      id: '/snags'
+    '/_authenticated/snags': {
+      id: '/_authenticated/snags'
       path: '/snags'
       fullPath: '/snags'
-      preLoaderRoute: typeof SnagsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedSnagsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAddonsRoute: typeof AuthenticatedAddonsRoute
+  AuthenticatedCommercialsRoute: typeof AuthenticatedCommercialsRoute
+  AuthenticatedDayworkRoute: typeof AuthenticatedDayworkRoute
+  AuthenticatedDrawingsRoute: typeof AuthenticatedDrawingsRoute
+  AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
+  AuthenticatedRfisRoute: typeof AuthenticatedRfisRoute
+  AuthenticatedSnagsRoute: typeof AuthenticatedSnagsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAddonsRoute: AuthenticatedAddonsRoute,
+  AuthenticatedCommercialsRoute: AuthenticatedCommercialsRoute,
+  AuthenticatedDayworkRoute: AuthenticatedDayworkRoute,
+  AuthenticatedDrawingsRoute: AuthenticatedDrawingsRoute,
+  AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
+  AuthenticatedRfisRoute: AuthenticatedRfisRoute,
+  AuthenticatedSnagsRoute: AuthenticatedSnagsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AddonsRoute: AddonsRoute,
-  CommercialsRoute: CommercialsRoute,
-  DrawingsRoute: DrawingsRoute,
-  ReturnsRoute: ReturnsRoute,
-  RfisRoute: RfisRoute,
-  SnagsRoute: SnagsRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

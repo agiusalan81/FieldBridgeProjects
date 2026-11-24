@@ -14,7 +14,7 @@ import { db, useTable, useRefresh, byId } from "@/lib/db";
 import { AddonNudge } from "@/components/fb/Addons";
 import { pageHead } from "@/lib/head";
 
-export const Route = createFileRoute("/returns")({
+export const Route = createFileRoute("/_authenticated/returns")({
   head: () => pageHead("Subcontractor Daily Return", "Log today's operatives, hours, plant, work location and delays from site."),
   component: Returns,
 });

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { db, useTable, useRefresh, byId, isOverdue } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 
-export const Route = createFileRoute("/rfis")({
+export const Route = createFileRoute("/_authenticated/rfis")({
   head: () => pageHead("RFI Register", "Requests for Information with level and gridline stamps, programme impact and consultant responses."),
   component: Rfis,
 });

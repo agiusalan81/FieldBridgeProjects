@@ -8,7 +8,7 @@ import { pageHead } from "@/lib/head";
 import { AddonNudge } from "@/components/fb/Addons";
 import { PaymentApplications } from "@/components/fb/PaymentApplications";
 
-export const Route = createFileRoute("/commercials")({
+export const Route = createFileRoute("/_authenticated/commercials")({
   head: () => pageHead("Commercials & Variations", "Contract sum, approved variations, anticipated final account and extension of time tracking."),
   component: Commercials,
 });

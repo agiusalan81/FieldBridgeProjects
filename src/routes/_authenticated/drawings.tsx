@@ -10,7 +10,7 @@ import { db, useTable, useRefresh, type Row } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/drawings")({
+export const Route = createFileRoute("/_authenticated/drawings")({
   head: () => pageHead("Drawing Register", "Construction issue drawings by discipline with pan/zoom viewer, pin drops and revision comparison."),
   component: Drawings,
 });

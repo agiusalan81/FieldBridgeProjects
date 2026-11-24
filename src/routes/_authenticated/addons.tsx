@@ -3,7 +3,7 @@ import { PageTitle } from "@/components/fb/AppShell";
 import { AddonCard } from "@/components/fb/Addons";
 import { pageHead } from "@/lib/head";
 
-export const Route = createFileRoute("/addons")({
+export const Route = createFileRoute("/_authenticated/addons")({
   head: () => pageHead("Add-ons: Books & Mail", "Connect FieldBridge Books for automatic invoicing and FieldBridge Mail for audited project correspondence."),
   component: Addons,
 });

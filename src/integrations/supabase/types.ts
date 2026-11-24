@@ -70,6 +70,78 @@ export type Database = {
           },
         ]
       }
+      daywork_sheets: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          labour_hours: number
+          labour_rate: number
+          materials_cost: number
+          plant_cost: number
+          project_id: string
+          sheet_number: string
+          signature_data_url: string | null
+          signed_at: string | null
+          signed_by: string | null
+          status: string
+          subcontractor_id: string | null
+          updated_at: string
+          work_date: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          labour_hours?: number
+          labour_rate?: number
+          materials_cost?: number
+          plant_cost?: number
+          project_id: string
+          sheet_number: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          subcontractor_id?: string | null
+          updated_at?: string
+          work_date?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          labour_hours?: number
+          labour_rate?: number
+          materials_cost?: number
+          plant_cost?: number
+          project_id?: string
+          sheet_number?: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          subcontractor_id?: string | null
+          updated_at?: string
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daywork_sheets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daywork_sheets_subcontractor_id_fkey"
+            columns: ["subcontractor_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drawing_pins: {
         Row: {
           created_at: string

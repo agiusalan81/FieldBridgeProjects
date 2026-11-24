@@ -55,3 +55,8 @@ export function valuation(a: { gross_work_value: number; approved_variations: nu
   const platformFee = r2(Number(a.platform_fixed_fee) + residualFee);
   return { gross, retention, netCumulative, dueThisPeriod, residualFee, platformFee };
 }
+
+/** Daywork sheet value = labour hours × rate + plant + materials. */
+export function dayworkTotal(d: { labour_hours: number; labour_rate: number; plant_cost: number; materials_cost: number }) {
+  return Math.round((Number(d.labour_hours) * Number(d.labour_rate) + Number(d.plant_cost) + Number(d.materials_cost)) * 100) / 100;
+}

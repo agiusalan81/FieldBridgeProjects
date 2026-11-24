@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/fb/StatusBadge";
 import { useTable, byId, eur, isOverdue, finalAccount } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => pageHead("Project Control Centre", "Live programme, headcount, RFIs, snags and variations for St. Michael's Commercial Complex."),
   component: Dashboard,
 });

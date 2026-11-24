@@ -14,7 +14,7 @@ const map: Record<string, keyof typeof tone> = {
   "Fixed - Awaiting Re-inspection": "blue", "Verified & Closed": "green",
   Approved: "green", Rejected: "red", "Submitted to PQS / Employer": "blue",
   "on-site": "green", mobilized: "amber", completed: "grey",
-  "For Construction": "green", "For Information": "blue", Tender: "grey",
+  "For Construction": "green", Signed: "green", "Awaiting Signature": "amber", "For Information": "blue", Tender: "grey",
 };
 
 export function StatusBadge({ value, className }: { value: string; className?: string }) {

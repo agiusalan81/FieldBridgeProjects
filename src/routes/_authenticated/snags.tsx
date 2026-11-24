@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTable, byId } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 
-export const Route = createFileRoute("/snags")({
+export const Route = createFileRoute("/_authenticated/snags")({
   head: () => pageHead("Snagging & Quality", "Defects register: open, fixed by subcontractor, re-inspected and closed by the Site Agent."),
   component: Snags,
 });
