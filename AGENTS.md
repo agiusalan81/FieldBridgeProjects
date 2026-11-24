@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- FieldBridge data access goes through `src/lib/db.ts` (`useTable` + untyped `db` client) so screens stay simple while the demo has no sign-in; RLS currently allows public read/insert/update for demo use — tighten when auth is added.

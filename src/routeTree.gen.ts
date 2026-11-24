@@ -10,33 +10,91 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CommercialsRouteImport } from './routes/commercials'
+import { Route as DrawingsRouteImport } from './routes/drawings'
+import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as RfisRouteImport } from './routes/rfis'
+import { Route as SnagsRouteImport } from './routes/snags'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommercialsRoute = CommercialsRouteImport.update({
+  id: '/commercials',
+  path: '/commercials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrawingsRoute = DrawingsRouteImport.update({
+  id: '/drawings',
+  path: '/drawings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RfisRoute = RfisRouteImport.update({
+  id: '/rfis',
+  path: '/rfis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnagsRoute = SnagsRouteImport.update({
+  id: '/snags',
+  path: '/snags',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/commercials': typeof CommercialsRoute
+  '/drawings': typeof DrawingsRoute
+  '/returns': typeof ReturnsRoute
+  '/rfis': typeof RfisRoute
+  '/snags': typeof SnagsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/commercials': typeof CommercialsRoute
+  '/drawings': typeof DrawingsRoute
+  '/returns': typeof ReturnsRoute
+  '/rfis': typeof RfisRoute
+  '/snags': typeof SnagsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/commercials': typeof CommercialsRoute
+  '/drawings': typeof DrawingsRoute
+  '/returns': typeof ReturnsRoute
+  '/rfis': typeof RfisRoute
+  '/snags': typeof SnagsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/commercials' | '/drawings' | '/returns' | '/rfis' | '/snags'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/commercials' | '/drawings' | '/returns' | '/rfis' | '/snags'
+  id:
+    | '__root__'
+    | '/'
+    | '/commercials'
+    | '/drawings'
+    | '/returns'
+    | '/rfis'
+    | '/snags'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommercialsRoute: typeof CommercialsRoute
+  DrawingsRoute: typeof DrawingsRoute
+  ReturnsRoute: typeof ReturnsRoute
+  RfisRoute: typeof RfisRoute
+  SnagsRoute: typeof SnagsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +106,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/commercials': {
+      id: '/commercials'
+      path: '/commercials'
+      fullPath: '/commercials'
+      preLoaderRoute: typeof CommercialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drawings': {
+      id: '/drawings'
+      path: '/drawings'
+      fullPath: '/drawings'
+      preLoaderRoute: typeof DrawingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rfis': {
+      id: '/rfis'
+      path: '/rfis'
+      fullPath: '/rfis'
+      preLoaderRoute: typeof RfisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/snags': {
+      id: '/snags'
+      path: '/snags'
+      fullPath: '/snags'
+      preLoaderRoute: typeof SnagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommercialsRoute: CommercialsRoute,
+  DrawingsRoute: DrawingsRoute,
+  ReturnsRoute: ReturnsRoute,
+  RfisRoute: RfisRoute,
+  SnagsRoute: SnagsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
