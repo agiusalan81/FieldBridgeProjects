@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import icon from "@/assets/icon-fieldbridge-projects.jpg";
 import { HardHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +38,7 @@ function Auth() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-shell p-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-3 rounded-md border-t-4 border-primary bg-card p-6">
-        <div className="flex items-center gap-2"><HardHat className="h-7 w-7 text-primary" /><span className="font-display text-2xl font-bold uppercase">FieldBridge Projects</span></div>
+        <div className="flex items-center gap-2"><img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" /><span className="font-display text-2xl font-bold uppercase">FieldBridge Projects</span></div>
         <p className="text-sm text-muted-foreground">{mode === "in" ? "Sign in to your project" : "Create your account"}</p>
         <Input type="email" required placeholder="Email" aria-label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Input type="password" required minLength={8} placeholder="Password" aria-label="Password" value={pw} onChange={(e) => setPw(e.target.value)} />

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import icon from "@/assets/icon-fieldbridge-projects.jpg";
 import { HardHat, LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b-4 border-primary bg-shell text-shell-foreground">
         <div className="flex flex-wrap items-center gap-3 px-4 py-2.5">
           <Link to="/" className="flex items-center gap-2">
-            <HardHat className="h-7 w-7 text-primary" />
+            <img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" />
             <span className="font-display text-xl font-bold uppercase tracking-wide">FieldBridge <span className="text-primary">Projects</span></span>
           </Link>
           <div className="hidden items-center gap-2 rounded-sm bg-sidebar-accent px-3 py-1.5 text-xs lg:flex">
