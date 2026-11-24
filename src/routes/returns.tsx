@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { db, useTable, useRefresh, byId } from "@/lib/db";
+import { AddonNudge } from "@/components/fb/Addons";
 import { pageHead } from "@/lib/head";
 
 export const Route = createFileRoute("/returns")({
@@ -111,6 +112,7 @@ function Returns() {
         </div>
         <Button size="lg" className="h-14 w-full text-lg font-bold" onClick={submit} disabled={saving}>{saving ? "Submitting…" : "Submit Daily Return"}</Button>
       </div>
+      <AddonNudge k="books" reason="Bill today's work the same day — Books Lite turns your returns into a payment claim." />
       <h2 className="mb-3 mt-8 font-display text-2xl font-bold uppercase">My Trade Snags ({mySnags.length})</h2>
       <div className="grid gap-3">
         {mySnags.map((s) => <SnagCard key={s.id} s={s} level={lv[s.level_zone_id]?.level_code} pkg={pkgs[s.package_id]?.package_name} />)}

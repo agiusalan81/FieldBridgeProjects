@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AddonsRouteImport } from './routes/addons'
 import { Route as CommercialsRouteImport } from './routes/commercials'
 import { Route as DrawingsRouteImport } from './routes/drawings'
 import { Route as ReturnsRouteImport } from './routes/returns'
@@ -19,6 +20,11 @@ import { Route as SnagsRouteImport } from './routes/snags'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddonsRoute = AddonsRouteImport.update({
+  id: '/addons',
+  path: '/addons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommercialsRoute = CommercialsRouteImport.update({
@@ -49,6 +55,7 @@ const SnagsRoute = SnagsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/addons': typeof AddonsRoute
   '/commercials': typeof CommercialsRoute
   '/drawings': typeof DrawingsRoute
   '/returns': typeof ReturnsRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/addons': typeof AddonsRoute
   '/commercials': typeof CommercialsRoute
   '/drawings': typeof DrawingsRoute
   '/returns': typeof ReturnsRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/addons': typeof AddonsRoute
   '/commercials': typeof CommercialsRoute
   '/drawings': typeof DrawingsRoute
   '/returns': typeof ReturnsRoute
@@ -75,12 +84,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/commercials' | '/drawings' | '/returns' | '/rfis' | '/snags'
+    | '/'
+    | '/addons'
+    | '/commercials'
+    | '/drawings'
+    | '/returns'
+    | '/rfis'
+    | '/snags'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/commercials' | '/drawings' | '/returns' | '/rfis' | '/snags'
+  to:
+    | '/'
+    | '/addons'
+    | '/commercials'
+    | '/drawings'
+    | '/returns'
+    | '/rfis'
+    | '/snags'
   id:
     | '__root__'
     | '/'
+    | '/addons'
     | '/commercials'
     | '/drawings'
     | '/returns'
@@ -90,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddonsRoute: typeof AddonsRoute
   CommercialsRoute: typeof CommercialsRoute
   DrawingsRoute: typeof DrawingsRoute
   ReturnsRoute: typeof ReturnsRoute
@@ -104,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/addons': {
+      id: '/addons'
+      path: '/addons'
+      fullPath: '/addons'
+      preLoaderRoute: typeof AddonsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/commercials': {
@@ -146,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddonsRoute: AddonsRoute,
   CommercialsRoute: CommercialsRoute,
   DrawingsRoute: DrawingsRoute,
   ReturnsRoute: ReturnsRoute,

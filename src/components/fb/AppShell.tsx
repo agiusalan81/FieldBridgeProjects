@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { HardHat, LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff } from "lucide-react";
+import { HardHat, LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { QuickCreate } from "./QuickCreate";
@@ -12,6 +12,7 @@ const nav = [
   { to: "/rfis", label: "RFIs", icon: HelpCircle },
   { to: "/snags", label: "Snagging", icon: Bug },
   { to: "/commercials", label: "Commercials", icon: Receipt },
+  { to: "/addons", label: "Add-ons", icon: Puzzle },
 ] as const;
 
 export const ROLES = ["Project Director", "Site Agent", "Subcontractor Lead", "Lead Consultant"];
@@ -62,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <main className="mx-auto max-w-[1500px] p-4 md:p-6">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t-2 border-primary bg-shell md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t-2 border-primary bg-shell md:hidden">
         {nav.map((n) => (
           <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }}
             className="flex flex-col items-center gap-0.5 py-2.5 text-[10px] text-shell-muted"
