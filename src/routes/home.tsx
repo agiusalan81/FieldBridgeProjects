@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layers, ClipboardList, HelpCircle, Bug, Receipt, FileSignature, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BetaBadge, LegalLinks } from "@/components/fb/Beta";
 import icon from "@/assets/icon-fieldbridge-projects.jpg";
 
 export const Route = createFileRoute("/home")({
@@ -40,6 +41,7 @@ function Home() {
           <div className="flex items-center gap-2">
             <img src={icon} alt="FieldBridge Projects logo" width={32} height={32} className="h-8 w-8 rounded-sm" />
             <span className="font-display text-xl font-bold uppercase tracking-wide">FieldBridge <span className="text-primary">Projects</span></span>
+            <BetaBadge />
           </div>
           <Button asChild size="sm"><Link to="/auth" search={{ redirect: "/" }}>Sign in</Link></Button>
         </div>
@@ -78,7 +80,7 @@ function Home() {
           </div>
         </div>
       </section>
-      <footer className="bg-shell py-8 text-center text-sm text-shell-muted">© 2026 FieldBridge Projects · fieldbridgeprojects.com</footer>
+      <footer className="bg-shell py-8 text-center text-sm text-shell-muted"><LegalLinks className="mb-3" />© 2026 FieldBridge Projects · fieldbridgeprojects.com</footer>
     </div>
   );
 }

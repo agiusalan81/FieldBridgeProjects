@@ -15,6 +15,7 @@ import { db, PROJECT_ID, setActiveProject, useTable } from "@/lib/db";
 import { initializeAccountAccess } from "@/lib/account-access";
 import { hasLocalAccess, isDisconnected, rememberAccess } from "@/lib/offline";
 import { OfflineStatus } from "./OfflineStatus";
+import { BetaBadge, LegalLinks } from "./Beta";
 
 type Item = { to: string; label: string; icon: typeof Layers };
 const HUBS: { hub: string; roles: string[]; items: Item[] }[] = [
@@ -111,6 +112,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" />
             <span className="font-display text-lg font-bold uppercase md:text-xl">FieldBridge <span className="text-primary">Projects</span></span>
           </Link>
+          <BetaBadge />
           <Select value={PROJECT_ID} onValueChange={(v) => v === "__new" ? setNewProject(true) : setActiveProject(v)}>
             <SelectTrigger aria-label="Active project" className="order-last h-9 w-full min-w-0 border-sidebar-border bg-sidebar-accent text-shell-foreground md:order-none md:max-w-[300px]"><SelectValue placeholder="Select project" /></SelectTrigger>
             <SelectContent>
@@ -135,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <OfflineStatus online={online} />
       </header>
       <div className="flex">
-        <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] w-60 shrink-0 overflow-y-auto border-r bg-shell text-shell-foreground md:block">{nav}</aside>
+        <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] w-60 shrink-0 overflow-y-auto border-r bg-shell text-shell-foreground md:block">{nav}<LegalLinks className="border-t border-sidebar-border p-3 text-shell-muted" /></aside>
         <main className="mx-auto min-w-0 w-full max-w-[1500px] break-words p-4 md:p-6">{children}</main>
       </div>
       {drawer && (

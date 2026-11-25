@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { BetaBadge, LegalLinks } from "@/components/fb/Beta";
 import icon from "@/assets/icon-fieldbridge-projects.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +59,7 @@ function Auth() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-shell p-4">
       <div className="w-full max-w-md space-y-3 rounded-md border-t-4 border-primary bg-card p-6">
-        <div className="flex items-center gap-2"><img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" /><span className="font-display text-2xl font-bold uppercase">FieldBridge Projects</span></div>
+        <div className="flex items-center gap-2"><img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" /><span className="font-display text-2xl font-bold uppercase">FieldBridge Projects</span><BetaBadge /></div>
         {mode === "in" ? (
           <form onSubmit={signIn} className="space-y-3">
             <p className="text-sm text-muted-foreground">Sign in to your project</p>
@@ -99,6 +100,7 @@ function Auth() {
         <button type="button" className="w-full text-sm text-muted-foreground underline" onClick={() => { setMode(mode === "in" ? "up" : "in"); setStep(1); }}>
           {mode === "in" ? "No account yet? Create one" : "Already have an account? Sign in"}
         </button>
+        <LegalLinks className="pt-2 text-muted-foreground" />
       </div>
     </div>
   );
