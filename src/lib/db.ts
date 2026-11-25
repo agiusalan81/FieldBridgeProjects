@@ -20,7 +20,7 @@ export function setActiveProject(id: string) {
 export type Row = any;
 
 /** Tables carrying project_id are always scoped to the active project. */
-const PROJECT_SCOPED = new Set(["daily_site_diaries", "daywork_sheets", "drawings", "payment_applications", "project_addons", "project_levels_zones", "rfis", "site_inspections", "snags", "subcontractor_claims", "subcontractors", "submittals", "trade_packages", "variations", "extra_work_quotes"]);
+const PROJECT_SCOPED = new Set(["daily_site_diaries", "daywork_sheets", "drawings", "payment_applications", "project_addons", "project_levels_zones", "rfis", "site_inspections", "snags", "subcontractor_claims", "subcontractors", "submittals", "trade_packages", "variations", "extra_work_quotes", "estimate_lines"]);
 
 export function useTable(table: string, opts: { order?: string; asc?: boolean; filter?: [string, string] } = {}) {
   return useQuery<Row[]>({

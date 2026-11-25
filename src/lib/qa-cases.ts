@@ -20,4 +20,8 @@ export const QA_CASES: QaCase[] = [
   { code: "FBP-SET-01", module: "Settings", title: "Client approval limit & sponsored passes", steps: "Settings → change approval limit and tick Sponsor passes → Save → values persist after reload.", route: "/settings" },
   { code: "FBP-SUP-01", module: "Suppliers", title: "Incumbent shown per package", steps: "Suppliers → package list shows awarded subcontractor; add a supplier.", route: "/suppliers" },
   { code: "FBP-LITE-01", module: "Sub Lite", title: "Quick extra-work quote → approve → variation", steps: "Sub Lite → Extra works → photo, description, amount → Send. PM approves in inbox → variation appears in Commercials; above limit shows 'Client sign-off'.", route: "/sub" },
+  { code: "FBP-ACC-01", module: "Accounts", title: "2-step sign-up with survey", steps: "Sign out → Create one → fill name, surname, company, email → Continue → answer survey → account created → appears in Sign-up Leads.", route: "/leads" },
+  { code: "FBP-TEAM-01", module: "Team", title: "Invite member joins on sign-in", steps: "Settings → Invite email as Member → that person signs up with the same email → listed as Accepted and sees the project.", route: "/settings" },
+  { code: "FBP-CERT-01", module: "Commercials", title: "Printable payment certificate", steps: "Valuations → Certificate on an application → figures match the row → Print / Save as PDF.", route: "/commercials" },
+  { code: "FBP-EST-01", module: "Estimate", title: "Budget vs committed variance", steps: "Estimate & Budget → set committed above budget on a line → red overspend; totals include approved variations.", route: "/estimate" },
 ];

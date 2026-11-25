@@ -50,9 +50,43 @@ function SettingsPage() {
             <thead><tr className="text-left text-xs uppercase text-muted-foreground"><th>User</th><th>Role</th><th>Since</th></tr></thead>
             <tbody>{(members.data ?? []).map((m) => <tr key={m.id} className="border-t"><td className="py-2 font-mono text-xs">{m.user_id.slice(0, 8)}…</td><td className="capitalize">{m.role}</td><td>{new Date(m.created_at).toLocaleDateString("en-GB")}</td></tr>)}</tbody>
           </table>
-          <p className="text-xs text-muted-foreground">Inviting members by email is queued with Google sign-in (next step on the roadmap).</p>
+          <InviteMembers />
         </div>
       </div>
+    </div>
+  );
+}
+
+const TITLES = ["Outsourced Project Manager", "Architect / Perit", "Quantity Surveyor / Commercial", "Site Agent", "Safety Officer", "Client / Developer rep", "Viewer"];
+function InviteMembers() {
+  const invites = useTable("project_invites", { order: "created_at", asc: false });
+  const refresh = useRefresh();
+  const [v, setV] = useState({ email: "", full_name: "", job_title: TITLES[0]!, role: "member" });
+  async function invite(e: React.FormEvent) {
+    e.preventDefault();
+    const email = v.email.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast.error("Enter a valid email"); return; }
+    const { error } = await db.from("project_invites").insert({ ...v, email, full_name: v.full_name.trim().slice(0, 100) });
+    if (error) { toast.error(error.message.includes("row-level") ? "Only managers can invite" : error.message); return; }
+    const link = `${window.location.origin}/auth`;
+    try { await navigator.clipboard.writeText(link); } catch { /* clipboard optional */ }
+    toast.success(`Invite saved. Sign-up link copied — send it to ${email}. They join when they sign in with that email.`);
+    setV({ ...v, email: "", full_name: "" }); refresh("project_invites");
+  }
+  async function cancel(id: string) { const { error } = await db.from("project_invites").delete().eq("id", id); if (error) toast.error(error.message); else refresh("project_invites"); }
+  return (
+    <div className="space-y-2 border-t pt-3">
+      <h3 className="text-sm font-bold uppercase">Invite a team member</h3>
+      <form onSubmit={invite} className="grid gap-2 sm:grid-cols-2">
+        <Input required type="email" placeholder="Email" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} />
+        <Input placeholder="Full name" value={v.full_name} onChange={(e) => setV({ ...v, full_name: e.target.value })} />
+        <select aria-label="Job title" className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={v.job_title} onChange={(e) => setV({ ...v, job_title: e.target.value })}>{TITLES.map((t) => <option key={t}>{t}</option>)}</select>
+        <select aria-label="Permission" className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={v.role} onChange={(e) => setV({ ...v, role: e.target.value })}><option value="member">Member (records only)</option><option value="manager">Manager (can approve & sign off)</option></select>
+        <Button type="submit" className="sm:col-span-2">Send invite</Button>
+      </form>
+      <ul className="space-y-1 text-sm">{(invites.data ?? []).map((i) => (
+        <li key={i.id} className="flex items-center justify-between rounded border px-2 py-1"><span>{i.full_name || i.email} <span className="text-xs text-muted-foreground">· {i.job_title} · {i.role} · {i.status}</span></span>{i.status === "Pending" && <Button size="sm" variant="ghost" onClick={() => cancel(i.id)}>Cancel</Button>}</li>
+      ))}</ul>
     </div>
   );
 }

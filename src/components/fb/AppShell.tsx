@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import icon from "@/assets/icon-fieldbridge-projects.jpg";
-import { LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut, FileCheck2, ListChecks, Users, ClipboardCheck, Settings, Truck, Smartphone, ChevronDown, Menu, X } from "lucide-react";
+import { LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut, FileCheck2, ListChecks, Users, ClipboardCheck, Settings, Truck, Smartphone, ChevronDown, Menu, X, Calculator } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ const HUBS: { hub: string; roles: string[]; items: Item[] }[] = [
   ] },
   { hub: "Commercials", roles: ["Project Director", "Client / Developer"], items: [
     { to: "/commercials", label: "Variations & Valuations", icon: Receipt },
+    { to: "/estimate", label: "Estimate & Budget", icon: Calculator },
     { to: "/daywork", label: "Dayworks", icon: FileSignature },
     { to: "/sub-portal", label: "Sub Claims & Compliance", icon: Users },
   ] },
@@ -50,6 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [online, setOnline] = useState(true);
   const [open, setOpen] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  useEffect(() => { void syncOnboarding(); }, []);
   const [newProject, setNewProject] = useState(false);
   const me = useMe();
   const projects = useTable("projects", { order: "project_number" });
@@ -90,6 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Select>
             <Button onClick={() => setOpen(true)} className="h-9 font-semibold" aria-label="Quick create"><Plus className="h-4 w-4" /><span className="hidden sm:inline">New</span></Button>
             {me.isOwner && <Link to="/qa-hub" aria-label="Live QA Hub" className="rounded p-2 text-primary hover:bg-sidebar-accent"><ClipboardCheck className="h-4 w-4" /></Link>}
+            {me.isOwner && <Link to="/leads" aria-label="Sign-up leads" className="rounded p-2 text-primary hover:bg-sidebar-accent"><Users className="h-4 w-4" /></Link>}
             <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>
@@ -193,4 +196,16 @@ export function PageTitle({ title, sub, children }: { title: string; sub?: strin
       {children}
     </div>
   );
+}
+
+/** After sign-in: save the sign-up survey (kept in account metadata until confirmed) and accept pending team invites. */
+async function syncOnboarding() {
+  const { data } = await supabase.auth.getUser();
+  const u = data.user; if (!u) return;
+  const m = (u.user_metadata ?? {}) as Record<string, unknown>;
+  if (m["first_name"]) {
+    await db.from("signup_profiles").upsert({ user_id: u.id, email: u.email, first_name: m["first_name"], last_name: m["last_name"] ?? "", company_name: m["company_name"] ?? "", phone: m["phone"] ?? null, organisation_type: m["organisation_type"] ?? null, job_role: m["job_role"] ?? null, team_size: m["team_size"] ?? null, problems: m["problems"] ?? [], reason: m["reason"] ?? null }, { onConflict: "user_id", ignoreDuplicates: true });
+  }
+  const { data: n } = await db.rpc("claim_invites");
+  if (n > 0) { toast.success("You've joined the project team"); window.location.reload(); }
 }

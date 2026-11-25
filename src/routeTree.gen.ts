@@ -17,7 +17,9 @@ import { Route as AuthenticatedAddonsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCommercialsRouteImport } from './routes/_authenticated/commercials'
 import { Route as AuthenticatedDayworkRouteImport } from './routes/_authenticated/daywork'
 import { Route as AuthenticatedDrawingsRouteImport } from './routes/_authenticated/drawings'
+import { Route as AuthenticatedEstimateRouteImport } from './routes/_authenticated/estimate'
 import { Route as AuthenticatedInspectionsRouteImport } from './routes/_authenticated/inspections'
+import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedQaHubRouteImport } from './routes/_authenticated/qa-hub'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedRfisRouteImport } from './routes/_authenticated/rfis'
@@ -27,6 +29,7 @@ import { Route as AuthenticatedSubRouteImport } from './routes/_authenticated/su
 import { Route as AuthenticatedSubPortalRouteImport } from './routes/_authenticated/sub-portal'
 import { Route as AuthenticatedSubmittalsRouteImport } from './routes/_authenticated/submittals'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
+import { Route as AuthenticatedCertificateIdRouteImport } from './routes/_authenticated/certificate/$id'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -68,12 +71,22 @@ const AuthenticatedDrawingsRoute = AuthenticatedDrawingsRouteImport.update({
   path: '/drawings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEstimateRoute = AuthenticatedEstimateRouteImport.update({
+  id: '/estimate',
+  path: '/estimate',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInspectionsRoute =
   AuthenticatedInspectionsRouteImport.update({
     id: '/inspections',
     path: '/inspections',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedQaHubRoute = AuthenticatedQaHubRouteImport.update({
   id: '/qa-hub',
   path: '/qa-hub',
@@ -119,6 +132,12 @@ const AuthenticatedSuppliersRoute = AuthenticatedSuppliersRouteImport.update({
   path: '/suppliers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCertificateIdRoute =
+  AuthenticatedCertificateIdRouteImport.update({
+    id: '/certificate/$id',
+    path: '/certificate/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -128,7 +147,9 @@ export interface FileRoutesByFullPath {
   '/commercials': typeof AuthenticatedCommercialsRoute
   '/daywork': typeof AuthenticatedDayworkRoute
   '/drawings': typeof AuthenticatedDrawingsRoute
+  '/estimate': typeof AuthenticatedEstimateRoute
   '/inspections': typeof AuthenticatedInspectionsRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/qa-hub': typeof AuthenticatedQaHubRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/rfis': typeof AuthenticatedRfisRoute
@@ -138,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/sub-portal': typeof AuthenticatedSubPortalRoute
   '/submittals': typeof AuthenticatedSubmittalsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
+  '/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -146,7 +168,9 @@ export interface FileRoutesByTo {
   '/commercials': typeof AuthenticatedCommercialsRoute
   '/daywork': typeof AuthenticatedDayworkRoute
   '/drawings': typeof AuthenticatedDrawingsRoute
+  '/estimate': typeof AuthenticatedEstimateRoute
   '/inspections': typeof AuthenticatedInspectionsRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/qa-hub': typeof AuthenticatedQaHubRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/rfis': typeof AuthenticatedRfisRoute
@@ -157,6 +181,7 @@ export interface FileRoutesByTo {
   '/submittals': typeof AuthenticatedSubmittalsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/': typeof AuthenticatedIndexRoute
+  '/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,7 +192,9 @@ export interface FileRoutesById {
   '/_authenticated/commercials': typeof AuthenticatedCommercialsRoute
   '/_authenticated/daywork': typeof AuthenticatedDayworkRoute
   '/_authenticated/drawings': typeof AuthenticatedDrawingsRoute
+  '/_authenticated/estimate': typeof AuthenticatedEstimateRoute
   '/_authenticated/inspections': typeof AuthenticatedInspectionsRoute
+  '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/qa-hub': typeof AuthenticatedQaHubRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/rfis': typeof AuthenticatedRfisRoute
@@ -178,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/submittals': typeof AuthenticatedSubmittalsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -189,7 +217,9 @@ export interface FileRouteTypes {
     | '/commercials'
     | '/daywork'
     | '/drawings'
+    | '/estimate'
     | '/inspections'
+    | '/leads'
     | '/qa-hub'
     | '/returns'
     | '/rfis'
@@ -199,6 +229,7 @@ export interface FileRouteTypes {
     | '/sub-portal'
     | '/submittals'
     | '/suppliers'
+    | '/certificate/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -207,7 +238,9 @@ export interface FileRouteTypes {
     | '/commercials'
     | '/daywork'
     | '/drawings'
+    | '/estimate'
     | '/inspections'
+    | '/leads'
     | '/qa-hub'
     | '/returns'
     | '/rfis'
@@ -218,6 +251,7 @@ export interface FileRouteTypes {
     | '/submittals'
     | '/suppliers'
     | '/'
+    | '/certificate/$id'
   id:
     | '__root__'
     | '/_authenticated'
@@ -227,7 +261,9 @@ export interface FileRouteTypes {
     | '/_authenticated/commercials'
     | '/_authenticated/daywork'
     | '/_authenticated/drawings'
+    | '/_authenticated/estimate'
     | '/_authenticated/inspections'
+    | '/_authenticated/leads'
     | '/_authenticated/qa-hub'
     | '/_authenticated/returns'
     | '/_authenticated/rfis'
@@ -238,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authenticated/submittals'
     | '/_authenticated/suppliers'
     | '/_authenticated/'
+    | '/_authenticated/certificate/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -304,11 +341,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDrawingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/estimate': {
+      id: '/_authenticated/estimate'
+      path: '/estimate'
+      fullPath: '/estimate'
+      preLoaderRoute: typeof AuthenticatedEstimateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/inspections': {
       id: '/_authenticated/inspections'
       path: '/inspections'
       fullPath: '/inspections'
       preLoaderRoute: typeof AuthenticatedInspectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/leads': {
+      id: '/_authenticated/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AuthenticatedLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/qa-hub': {
@@ -374,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuppliersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/certificate/$id': {
+      id: '/_authenticated/certificate/$id'
+      path: '/certificate/$id'
+      fullPath: '/certificate/$id'
+      preLoaderRoute: typeof AuthenticatedCertificateIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -382,7 +440,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommercialsRoute: typeof AuthenticatedCommercialsRoute
   AuthenticatedDayworkRoute: typeof AuthenticatedDayworkRoute
   AuthenticatedDrawingsRoute: typeof AuthenticatedDrawingsRoute
+  AuthenticatedEstimateRoute: typeof AuthenticatedEstimateRoute
   AuthenticatedInspectionsRoute: typeof AuthenticatedInspectionsRoute
+  AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedQaHubRoute: typeof AuthenticatedQaHubRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedRfisRoute: typeof AuthenticatedRfisRoute
@@ -393,6 +453,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSubmittalsRoute: typeof AuthenticatedSubmittalsRoute
   AuthenticatedSuppliersRoute: typeof AuthenticatedSuppliersRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCertificateIdRoute: typeof AuthenticatedCertificateIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -400,7 +461,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommercialsRoute: AuthenticatedCommercialsRoute,
   AuthenticatedDayworkRoute: AuthenticatedDayworkRoute,
   AuthenticatedDrawingsRoute: AuthenticatedDrawingsRoute,
+  AuthenticatedEstimateRoute: AuthenticatedEstimateRoute,
   AuthenticatedInspectionsRoute: AuthenticatedInspectionsRoute,
+  AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedQaHubRoute: AuthenticatedQaHubRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedRfisRoute: AuthenticatedRfisRoute,
@@ -411,6 +474,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSubmittalsRoute: AuthenticatedSubmittalsRoute,
   AuthenticatedSuppliersRoute: AuthenticatedSuppliersRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCertificateIdRoute: AuthenticatedCertificateIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

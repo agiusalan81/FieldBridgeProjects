@@ -36,3 +36,5 @@ use the editor.
 - Project data access is limited to `public.project_members`; approvals/sign-offs (certify, approve, resolve, sign) are manager-only, enforced by the `enforce_manager_signoff` DB trigger, so UI buttons are convenience only.
 - The active project lives in `PROJECT_ID` (live binding in `src/lib/db.ts`, persisted in localStorage; switching reloads); `useTable` auto-scopes project_id tables, so new project tables must be added to `PROJECT_SCOPED`.
 - App navigation is grouped hubs in `AppShell.tsx` (`HUBS`), filtered by the selected workspace view; add new pages to a hub there.
+- Sign-up survey answers are stored in auth metadata at sign-up and copied to `signup_profiles` (owner-only read, `/leads`) by `syncOnboarding` in AppShell after first sign-in, because no session exists before email confirmation; the same call runs `claim_invites()` to turn `project_invites` into memberships.
+- Estimate rollups live in `src/lib/estimate.ts` (tested); payment certificates are printable views over `valuation()`, so no separate certificate data exists.

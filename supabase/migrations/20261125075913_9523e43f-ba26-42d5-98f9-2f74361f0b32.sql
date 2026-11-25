@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS estimate_lines_project_idx ON public.estimate_lines(project_id);

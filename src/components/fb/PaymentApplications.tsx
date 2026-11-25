@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,7 @@ export function PaymentApplications({ projectId }: { projectId?: string }) {
                   <td className="py-3"><StatusBadge value={a.status} /></td>
                   <td className="py-3 text-xs">{a.books_sync_status}{a.books_reference && <div className="font-mono">{a.books_reference}</div>}</td>
                   <td className="py-3 pr-3"><div className="flex gap-1">
+                    <Link to="/certificate/$id" params={{ id: a.id }} className="rounded border px-2 py-1 text-xs font-semibold hover:bg-muted">Certificate</Link>
                     {a.status === "Draft" && <Button size="sm" onClick={() => update(a.id, { status: "Submitted" }, "Submitted to employer")}>Submit</Button>}
                     {a.status === "Submitted" && <Button size="sm" onClick={() => update(a.id, { status: "Certified" }, "Certified")}>Certify</Button>}
                     {a.status === "Certified" && a.books_sync_status !== "Synced" && <Button size="sm" variant="outline" onClick={() => update(a.id, { books_sync_status: "Queued for Books" }, "Queued for FieldBridge Books")}>Send to Books</Button>}
