@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MousePointer2, MapPin, GitCompare, Camera, ImagePlus, FileText, Loader2 } from "lucide-react";
 import { PlanViewer } from "@/components/fb/PlanViewer";
@@ -23,6 +23,8 @@ import { PhotoPicker } from "@/components/fb/PhotoPicker";
 import { PROJECT_ID } from "@/lib/db";
 import { saveSiteRecord } from "@/lib/offline";
 import { nextNumber } from "@/lib/workflow";
+import { drawingPinStatus } from "@/lib/issue-register";
+import { RegisterFilter } from "@/components/fb/RegisterFilter";
 
 export const Route = createFileRoute("/_authenticated/drawings")({
   head: () => pageHead("Drawing Register", "Construction issue drawings by discipline with pan/zoom viewer, pin drops and revision comparison."),
@@ -36,6 +38,8 @@ function Drawings() {
   const drawings = useTable("drawings", { order: "sheet_number" });
   const revisions = useTable("drawing_revisions", { order: "date_issued", asc: false });
   const pins = useTable("drawing_pins");
+  const rfis = useTable("rfis");
+  const snags = useTable("snags");
   const refresh = useRefresh();
   const [selId, setSelId] = useState<string>();
   const sel = drawings.data?.find((d) => d.id === selId) ?? drawings.data?.[0];
@@ -44,6 +48,9 @@ function Drawings() {
   const [hazard, setHazard] = useState<{ type: "observation" | "safety_hazard"; x: number; y: number } | null>(null);
   const [pinId, setPinId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyStatus, setHistoryStatus] = useState("Resolved");
+  const [historyType, setHistoryType] = useState("all");
   const [create, setCreate] = useState<{ kind: "rfi" | "snag"; x: number; y: number } | null>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +59,10 @@ function Drawings() {
     drawings.data?.forEach((d) => { const k = d.discipline.startsWith("MEP") ? "MEP Services" : d.discipline; (g[k] ??= []).push(d); });
     return g;
   }, [drawings.data]);
-  const sheetPins = pins.data?.filter((p) => p.drawing_id === sel?.id) ?? [];
+  const effectivePins = (pins.data ?? []).map((p) => ({ ...p, status: drawingPinStatus(p, rfis.data ?? [], snags.data ?? []) }));
+  const allSheetPins = effectivePins.filter((p) => p.drawing_id === sel?.id);
+  const sheetPins = allSheetPins.filter((p) => p.status !== "Resolved");
+  const historyPins = allSheetPins.filter((p) => (historyStatus === "All" || p.status === historyStatus) && (historyType === "all" || p.pin_type === historyType));
   const revs = revisions.data?.filter((r) => r.drawing_id === sel?.id) ?? [];
 
   async function onClick(e: React.MouseEvent) {
@@ -68,7 +78,7 @@ function Drawings() {
     <>
       <PageTitle title="Drawing & Specification Register" sub="Construction issue sheets"><Button onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" />Add drawing</Button></PageTitle>
       {drawings.error && <p role="alert" className="mb-3 text-sm text-destructive">{drawings.error.message}</p>}
-      <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="space-y-4">
           {Object.entries(grouped).map(([disc, list]) => (
             <div key={disc}>
@@ -78,7 +88,7 @@ function Drawings() {
                   className={`mb-1.5 w-full rounded-md border bg-card p-3 text-left ${sel?.id === d.id ? "border-primary ring-2 ring-primary" : ""}`}>
                   <div className="flex items-center justify-between"><span className="font-mono text-sm font-semibold">{d.sheet_number}</span><span className="font-mono text-xs">{d.current_revision}</span></div>
                   <div className="text-sm">{d.sheet_title}</div>
-                  <div className="mt-1 flex items-center justify-between"><StatusBadge value={d.status} /><span className="text-[11px] text-muted-foreground">{pins.data?.filter((p) => p.drawing_id === d.id).length ?? 0} pins</span></div>
+                  <div className="mt-1 flex items-center justify-between"><StatusBadge value={d.status} /><span className="text-[11px] text-muted-foreground">{effectivePins.filter((p) => p.drawing_id === d.id && p.status !== "Resolved").length} active pins</span></div>
                 </button>
               ))}
             </div>
@@ -107,7 +117,7 @@ function Drawings() {
                     {sheetPins.map((p) => (
                       <div key={p.id} title={`${pinLabel[p.pin_type]} ${p.reference_id ?? ""}: ${p.note ?? ""}`}
                         onClick={(e) => { e.stopPropagation(); setPinId(p.id); }}
-                        className={`group absolute -translate-x-1/2 -translate-y-full cursor-pointer ${p.status === "Resolved" ? "opacity-50" : ""}`} style={{ left: `${p.x_percent}%`, top: `${p.y_percent}%` }}>
+                        className="group absolute -translate-x-1/2 -translate-y-full cursor-pointer" style={{ left: `${p.x_percent}%`, top: `${p.y_percent}%` }}>
                         <div className={`flex h-7 min-w-7 items-center justify-center rounded-full rounded-bl-none border-2 border-card px-1 text-[10px] font-bold text-success-foreground shadow ${pinColor[p.pin_type]}`}>
                           {p._offline ? "↥" : p.reference_id?.split("-")[1] ?? "!"}
                         </div>
@@ -120,7 +130,20 @@ function Drawings() {
                 </PlanViewer>
               </>);
             })()}
-            <div className="mt-3 rounded-md border bg-card p-3">
+            <section className="mt-4 border-t pt-3">
+              <Button variant="outline" aria-expanded={historyOpen} className="mb-3" onClick={() => setHistoryOpen((o) => !o)}>Issue history · {allSheetPins.filter((p) => p.status === "Resolved").length} resolved</Button>
+              {historyOpen && <>
+                <div className="mb-3 flex flex-wrap gap-2">{["All", "Open", "Resolved"].map((s) => <Button key={s} variant={historyStatus === s ? "default" : "outline"} size="sm" onClick={() => setHistoryStatus(s)}>{s}</Button>)}</div>
+                <div className="mb-3 max-w-sm"><RegisterFilter label="issue types" value={historyType} onChange={setHistoryType} items={Object.entries(pinLabel)} /></div>
+                <div className="grid gap-2">{historyPins.map((p) => <Button key={p.id} variant="outline" className="h-auto min-w-0 flex-col items-stretch gap-1 whitespace-normal p-3 text-left" onClick={() => setPinId(p.id)}>
+                  <span className="flex flex-wrap justify-between gap-2"><span className="font-semibold">{pinLabel[p.pin_type]} {p.reference_id}</span><StatusBadge value={p.status} /></span>
+                  <span className="break-words text-sm">{p.note}</span>
+                  {p.resolved_at && <span className="text-xs text-muted-foreground">Resolved {new Date(p.resolved_at).toLocaleDateString()}</span>}
+                </Button>)}</div>
+                {!historyPins.length && <p className="py-3 text-sm text-muted-foreground">No issues match these filters.</p>}
+              </>}
+            </section>
+            <div className="mt-3 overflow-x-auto rounded-md border bg-card p-3">
               <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Revision history</h3>
               <table className="w-full text-sm"><tbody>
                 {revs.map((r) => <tr key={r.id} className="border-t"><td className="py-1.5 font-mono font-semibold">{r.revision_code}</td><td>{r.date_issued}</td><td>{r.issued_by}</td><td className="text-muted-foreground">{r.reason_for_issue}</td></tr>)}
@@ -130,7 +153,7 @@ function Drawings() {
         )}
       </div>
       {hazard && sel && <HazardDialog drawing={sel} spot={hazard} onClose={() => setHazard(null)} />}
-      <PinInspector pin={pins.data?.find((p) => p.id === pinId)} onClose={() => setPinId(null)} />
+      <PinInspector pin={effectivePins.find((p) => p.id === pinId)} onClose={() => setPinId(null)} />
       <AddDrawing open={addOpen} onOpenChange={setAddOpen} onCreated={(id) => setSelId(id)} />
       {create && sel && (
         <QuickCreate open onOpenChange={(o) => !o && setCreate(null)} initial={{ kind: create.kind, drawing_id: sel.id, x: create.x, y: create.y }} />
@@ -199,6 +222,7 @@ function PinInspector({ pin, onClose }: { pin?: Row; onClose: () => void }) {
               }} />
             ))}
             {!pin._offline && <DeleteMistake table="drawing_pins" row={pin} label={`pin ${pin.reference_id ?? ""}`} onDone={onClose} />}
+            {["rfi", "snag"].includes(pin.pin_type) && <Button variant="outline" className="h-11 w-full" asChild><Link to={pin.pin_type === "rfi" ? "/rfis" : "/snags"}>Open {pin.pin_type === "rfi" ? "RFI" : "Snagging"} register</Link></Button>}
             <Button variant="outline" className="h-11 w-full" onClick={onClose}>Back to drawing</Button>
             <div className="h-24" aria-hidden />
           </div>

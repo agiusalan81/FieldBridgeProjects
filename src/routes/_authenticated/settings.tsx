@@ -46,10 +46,10 @@ function SettingsPage() {
         </form>
         <div className="space-y-3 rounded-md border bg-card p-4">
           <h2 className="font-display text-lg font-bold uppercase">Project team</h2>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[360px] text-sm">
             <thead><tr className="text-left text-xs uppercase text-muted-foreground"><th>User</th><th>Role</th><th>Since</th></tr></thead>
             <tbody>{(members.data ?? []).map((m) => <tr key={m.id} className="border-t"><td className="py-2 font-mono text-xs">{m.user_id.slice(0, 8)}…</td><td className="capitalize">{m.role}</td><td>{new Date(m.created_at).toLocaleDateString("en-GB")}</td></tr>)}</tbody>
-          </table>
+          </table></div>
           <InviteMembers />
         </div>
       </div>
@@ -85,7 +85,7 @@ function InviteMembers() {
         <Button type="submit" className="sm:col-span-2">Send invite</Button>
       </form>
       <ul className="space-y-1 text-sm">{(invites.data ?? []).map((i) => (
-        <li key={i.id} className="flex items-center justify-between rounded border px-2 py-1"><span>{i.full_name || i.email} <span className="text-xs text-muted-foreground">· {i.job_title} · {i.role} · {i.status}</span></span>{i.status === "Pending" && <Button size="sm" variant="ghost" onClick={() => cancel(i.id)}>Cancel</Button>}</li>
+        <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 rounded border px-2 py-1"><span className="min-w-0 break-words">{i.full_name || i.email} <span className="text-xs text-muted-foreground">· {i.job_title} · {i.role} · {i.status}</span></span>{i.status === "Pending" && <Button size="sm" variant="ghost" onClick={() => cancel(i.id)}>Cancel</Button>}</li>
       ))}</ul>
     </div>
   );

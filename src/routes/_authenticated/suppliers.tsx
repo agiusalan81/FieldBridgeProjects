@@ -29,12 +29,12 @@ function Suppliers() {
       <PageTitle title="Suppliers & Incumbents" sub="Who holds each package — extras on a package go to its incumbent first." />
       <section className="rounded-md border bg-card p-4">
         <h2 className="mb-2 font-display text-lg font-bold uppercase">Awarded packages</h2>
-        <table className="w-full text-sm"><thead><tr className="text-left text-xs uppercase text-muted-foreground"><th>Package</th><th>Value</th><th>Incumbent</th><th>Contact</th></tr></thead>
+        <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm"><thead><tr className="text-left text-xs uppercase text-muted-foreground"><th>Package</th><th>Value</th><th>Incumbent</th><th>Contact</th></tr></thead>
           <tbody>{(pk.data ?? []).map((p) => { const s = (subs.data ?? []).find((x) => x.package_id === p.id); return (
-            <tr key={p.id} className="border-t"><td className="py-2"><span className="font-mono text-xs">{p.package_code}</span> {p.package_name}</td><td>{eur(p.subcontract_value)}</td><td className="font-semibold">{s?.company_name ?? <span className="text-muted-foreground">Not awarded</span>}</td><td className="text-xs">{s ? `${s.package_lead_name ?? ""} ${s.email ?? ""}` : ""}</td></tr>); })}</tbody></table>
+            <tr key={p.id} className="border-t"><td className="py-2"><span className="font-mono text-xs">{p.package_code}</span> {p.package_name}</td><td>{eur(p.subcontract_value)}</td><td className="font-semibold">{s?.company_name ?? <span className="text-muted-foreground">Not awarded</span>}</td><td className="text-xs">{s ? `${s.package_lead_name ?? ""} ${s.email ?? ""}` : ""}</td></tr>); })}</tbody></table></div>
       </section>
-      <section className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="rounded-md border bg-card p-4">
+      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 rounded-md border bg-card p-4">
           <h2 className="mb-2 font-display text-lg font-bold uppercase">Preferred supplier directory</h2>
           <div className="grid gap-2 sm:grid-cols-2">{(sup.data ?? []).map((s) => (
             <div key={s.id} className="rounded border p-3 text-sm">

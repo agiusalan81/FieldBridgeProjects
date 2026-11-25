@@ -105,14 +105,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <header className="sticky top-0 z-30 border-b-4 border-primary bg-shell text-shell-foreground">
-        <div className="flex flex-wrap items-center gap-3 px-4 py-2.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 px-3 py-2.5 md:gap-3 md:px-4">
           <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu" onClick={() => setDrawer(true)}><Menu className="h-5 w-5" /></Button>
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
             <img src={icon} alt="FieldBridge Projects logo" width={28} height={28} className="h-7 w-7 rounded-sm" />
-            <span className="font-display text-xl font-bold uppercase tracking-wide">FieldBridge <span className="text-primary">Projects</span></span>
+            <span className="font-display text-lg font-bold uppercase md:text-xl">FieldBridge <span className="text-primary">Projects</span></span>
           </Link>
           <Select value={PROJECT_ID} onValueChange={(v) => v === "__new" ? setNewProject(true) : setActiveProject(v)}>
-            <SelectTrigger aria-label="Active project" className="h-9 max-w-[300px] border-sidebar-border bg-sidebar-accent text-shell-foreground"><SelectValue placeholder="Select project" /></SelectTrigger>
+            <SelectTrigger aria-label="Active project" className="order-last h-9 w-full min-w-0 border-sidebar-border bg-sidebar-accent text-shell-foreground md:order-none md:max-w-[300px]"><SelectValue placeholder="Select project" /></SelectTrigger>
             <SelectContent>
               {(projects.data ?? []).map((p) => <SelectItem key={p.id} value={p.id}>{p.project_number} · {p.name}</SelectItem>)}
               <SelectItem value="__new">+ New project</SelectItem>
@@ -120,29 +120,40 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Select>
           <div className="ml-auto flex items-center gap-2">
             <span className={`flex items-center gap-1 rounded-sm px-2 py-1 text-[11px] font-semibold uppercase ${online ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
-              {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}{online ? "Online" : "Offline"}
+              {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}<span className="hidden md:inline">{online ? "Online" : "Offline"}</span>
             </span>
             <Select value={role} onValueChange={(r) => { setRole(r); localStorage.setItem("fbp.role", r); }}>
-              <SelectTrigger aria-label="Workspace view" className="h-9 w-[170px] border-sidebar-border bg-sidebar-accent text-shell-foreground"><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-label="Workspace view" className="hidden h-9 w-[170px] border-sidebar-border bg-sidebar-accent text-shell-foreground md:flex"><SelectValue /></SelectTrigger>
               <SelectContent>{ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
             </Select>
             <Button onClick={() => setOpen(true)} className="h-9 font-semibold" aria-label="Quick create"><Plus className="h-4 w-4" /><span className="hidden sm:inline">New</span></Button>
-            {me.isOwner && <Link to="/qa-hub" aria-label="Live QA Hub" className="rounded p-2 text-primary hover:bg-sidebar-accent"><ClipboardCheck className="h-4 w-4" /></Link>}
-            {me.isOwner && <Link to="/leads" aria-label="Sign-up leads" className="rounded p-2 text-primary hover:bg-sidebar-accent"><Users className="h-4 w-4" /></Link>}
-            <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" /></Button>
+            {me.isOwner && <Link to="/qa-hub" aria-label="Live QA Hub" className="hidden rounded p-2 text-primary hover:bg-sidebar-accent md:block"><ClipboardCheck className="h-4 w-4" /></Link>}
+            {me.isOwner && <Link to="/leads" aria-label="Sign-up leads" className="hidden rounded p-2 text-primary hover:bg-sidebar-accent md:block"><Users className="h-4 w-4" /></Link>}
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>
         <OfflineStatus online={online} />
       </header>
       <div className="flex">
         <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] w-60 shrink-0 overflow-y-auto border-r bg-shell text-shell-foreground md:block">{nav}</aside>
-        <main className="mx-auto w-full max-w-[1500px] p-4 md:p-6">{children}</main>
+        <main className="mx-auto min-w-0 w-full max-w-[1500px] break-words p-4 md:p-6">{children}</main>
       </div>
       {drawer && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-foreground/50" onClick={() => setDrawer(false)} />
           <aside className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-shell text-shell-foreground">
             <div className="flex justify-end p-2"><Button variant="ghost" size="icon" aria-label="Close menu" onClick={() => setDrawer(false)}><X className="h-5 w-5" /></Button></div>
+            <div className="space-y-3 border-b border-sidebar-border p-3">
+              <Select value={role} onValueChange={(r) => { setRole(r); localStorage.setItem("fbp.role", r); }}>
+                <SelectTrigger aria-label="Workspace view" className="w-full border-sidebar-border bg-sidebar-accent text-shell-foreground"><SelectValue /></SelectTrigger>
+                <SelectContent>{ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+              </Select>
+              <div className="flex flex-wrap gap-2">
+                {me.isOwner && <Button variant="ghost" asChild><Link to="/qa-hub" onClick={() => setDrawer(false)}><ClipboardCheck className="h-4 w-4" />Live QA Hub</Link></Button>}
+                {me.isOwner && <Button variant="ghost" asChild><Link to="/leads" onClick={() => setDrawer(false)}><Users className="h-4 w-4" />Sign-up leads</Link></Button>}
+                <Button variant="ghost" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" />Sign out</Button>
+              </div>
+            </div>
             {nav}
           </aside>
         </div>
@@ -226,8 +237,8 @@ function NewProject({ open, onOpenChange }: { open: boolean; onOpenChange: (o: b
 export function PageTitle({ title, sub, children }: { title: string; sub?: string; children?: ReactNode }) {
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="font-display text-3xl font-bold uppercase tracking-wide text-foreground">{title}</h1>
+      <div className="min-w-0">
+        <h1 className="break-words font-display text-2xl font-bold uppercase text-foreground md:text-3xl">{title}</h1>
         {sub && <p className="text-sm text-muted-foreground">{sub}</p>}
       </div>
       {children}

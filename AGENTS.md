@@ -46,3 +46,5 @@ use the editor.
 - Table read caches share the outbox's user/project isolation; offline opening uses a previously confirmed local identity (not a bearer token), cleared with read caches on sign-out; replay always revalidates Auth, so expired tokens cannot grant server access.
 - App-shell caching uses generateSW with NetworkFirst navigation and a single preview-guarded registrar; OAuth, API and remote-signature pages are excluded to avoid stale secure responses.
 - RFI creation location comes from the shared pin-location rule; pinned records never submit gridline text, keeping register and drawing creation consistent.
+- Drawing pin visibility derives from linked register status through `src/lib/issue-register.ts`, rather than duplicated closure writes; this keeps reopening and every sign-off path consistent without deleting historical evidence.
+- Register dropdowns share `RegisterFilter` and combined filtering lives in `issue-register.ts`; this keeps mobile history controls and filter rules consistent.

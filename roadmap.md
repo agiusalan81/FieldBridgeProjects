@@ -1,3 +1,12 @@
+# Drawing cleanup and historical registers
+
+- [x] Hide resolved pins using linked RFI/snag status without deleting records.
+- [x] Add RFI level, consultant and discipline filters and mobile cards.
+- [x] Add snag status and subcontractor filters with retained evidence.
+- [x] Keep resolved observations and hazards accessible from drawing history.
+- [x] Contain mobile layouts, add regression tests and update live QA cases.
+- [ ] Verify signed-in Drawings, RFIs and Snags — blocked: user-managed Supabase cannot mint an automated session; isolated mobile filter, detail and pin-history checks passed.
+
 # Account-access repair
 
 - [x] Repair confirmed platform-owner membership and preserve invited roles without elevating uninvited accounts.
