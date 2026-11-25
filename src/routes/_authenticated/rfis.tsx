@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { db, useTable, useRefresh, byId, isOverdue } from "@/lib/db";
 import { pageHead } from "@/lib/head";
+import { DeleteMistake, ToVariation } from "@/components/fb/Workflow";
 
 export const Route = createFileRoute("/_authenticated/rfis")({
   head: () => pageHead("RFI Register", "Requests for Information with level and gridline stamps, programme impact and consultant responses."),
@@ -75,6 +76,10 @@ function Rfis() {
                 <div className="rounded border p-2">Drawing<br /><b className="font-mono">{dw[sel.drawing_id]?.sheet_number ?? "—"}</b></div>
               </div>
               <div><div className="text-xs font-bold uppercase text-muted-foreground">Query</div><p className="text-sm">{sel.query_details}</p></div>
+              <div className="flex flex-wrap gap-2">
+                <DeleteMistake table="rfis" row={sel} label={sel.rfi_number} onDone={() => setSelId(null)} />
+                {sel.cost_impact && sel.cost_impact !== "None" && <ToVariation source="rfi" sourceId={sel.id} linkTable="rfis" title={`${sel.rfi_number}: ${sel.title}`} scope={sel.official_response ?? sel.query_details} eot={sel.programme_impact_days ?? undefined} disabled={!!sel.variation_id} />}
+              </div>
               <div className="text-sm">Assigned: <b>{sel.assigned_consultant ?? "Unassigned"}</b></div>
               <div className="rounded-md border-2 border-shell p-3">
                 <div className="mb-2 text-xs font-bold uppercase">Engineer / Architect formal response</div>

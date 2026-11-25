@@ -5,6 +5,7 @@ import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
 import { SignaturePad } from "@/components/fb/SignaturePad";
 import { Button } from "@/components/ui/button";
+import { DeleteMistake, ToVariation } from "@/components/fb/Workflow";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -65,6 +66,7 @@ function Daywork() {
               </div>
               <div className="text-right"><div className="font-display text-2xl font-bold">{eur(dayworkTotal(r))}</div>
                 {r.status !== "Signed" && <Button size="sm" className="mt-1" onClick={() => setSignId(r.id)}>Sign off</Button>}
+                <div className="mt-1 flex flex-wrap justify-end gap-1">{r.status === "Signed" && <ToVariation source="daywork" sourceId={r.id} linkTable="daywork_sheets" title={`Daywork ${r.sheet_number}: ${r.description}`} amount={dayworkTotal(r)} disabled={!!r.variation_id} />}<DeleteMistake table="daywork_sheets" row={r} label={r.sheet_number} /></div>
               </div>
             </div>
           ))}

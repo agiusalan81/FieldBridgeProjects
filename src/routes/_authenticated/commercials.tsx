@@ -49,14 +49,14 @@ function Commercials() {
             {v.map((x) => (
               <tr key={x.id} className="border-t align-top">
                 <td className="p-3 font-mono font-bold">{x.variation_number}</td>
-                <td className="py-3"><div className="font-medium">{x.title}</div><div className="text-xs text-muted-foreground">{x.instruction_source} · {x.scope_description}</div></td>
+                <td className="py-3"><div className="font-medium">{x.title}</div><div className="text-xs text-muted-foreground">{x.instruction_source} · {x.scope_description}</div>{x.source_type && <div className="text-[11px] font-semibold uppercase text-primary">From {x.source_type === "rfi" ? "RFI" : "daywork sheet"}</div>}</td>
                 <td className="py-3 text-right font-mono">{eur(x.subcontractor_quotation)}</td>
                 <td className="py-3 text-right font-mono">{eur(x.claimed_contractor_amount)}</td>
                 <td className="py-3 text-right font-mono">{eur(x.approved_employer_amount)}</td>
                 <td className="py-3 text-right font-mono text-success">{x.approved_employer_amount ? eur(x.approved_employer_amount - x.subcontractor_quotation) : "—"}</td>
                 <td className="py-3 text-center font-mono">{x.eot_days_claimed}d / {x.eot_days_granted}d</td>
                 <td className="py-3"><StatusBadge value={x.status} /></td>
-                <td className="py-3 pr-3">{x.status.startsWith("Submitted") && <div className="flex gap-1"><Button size="sm" onClick={() => decide(x.id, x, true)}>Approve</Button><Button size="sm" variant="outline" onClick={() => decide(x.id, x, false)}>Reject</Button></div>}</td>
+                <td className="py-3 pr-3">{x.status === "Potential" && <Button size="sm" variant="outline" onClick={async () => { const { error } = await db.from("variations").update({ status: "Submitted" }).eq("id", x.id); if (error) toast.error(error.message); else { toast.success("Submitted to client for approval"); refresh("variations"); } }}>Price & submit</Button>}{x.status.startsWith("Submitted") && <div className="flex gap-1"><Button size="sm" onClick={() => decide(x.id, x, true)}>Approve</Button><Button size="sm" variant="outline" onClick={() => decide(x.id, x, false)}>Reject</Button></div>}</td>
               </tr>
             ))}
           </tbody>

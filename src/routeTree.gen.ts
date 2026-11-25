@@ -17,9 +17,13 @@ import { Route as AuthenticatedAddonsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCommercialsRouteImport } from './routes/_authenticated/commercials'
 import { Route as AuthenticatedDayworkRouteImport } from './routes/_authenticated/daywork'
 import { Route as AuthenticatedDrawingsRouteImport } from './routes/_authenticated/drawings'
+import { Route as AuthenticatedInspectionsRouteImport } from './routes/_authenticated/inspections'
+import { Route as AuthenticatedQaHubRouteImport } from './routes/_authenticated/qa-hub'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedRfisRouteImport } from './routes/_authenticated/rfis'
 import { Route as AuthenticatedSnagsRouteImport } from './routes/_authenticated/snags'
+import { Route as AuthenticatedSubPortalRouteImport } from './routes/_authenticated/sub-portal'
+import { Route as AuthenticatedSubmittalsRouteImport } from './routes/_authenticated/submittals'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -61,6 +65,17 @@ const AuthenticatedDrawingsRoute = AuthenticatedDrawingsRouteImport.update({
   path: '/drawings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInspectionsRoute =
+  AuthenticatedInspectionsRouteImport.update({
+    id: '/inspections',
+    path: '/inspections',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedQaHubRoute = AuthenticatedQaHubRouteImport.update({
+  id: '/qa-hub',
+  path: '/qa-hub',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
@@ -76,6 +91,16 @@ const AuthenticatedSnagsRoute = AuthenticatedSnagsRouteImport.update({
   path: '/snags',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSubPortalRoute = AuthenticatedSubPortalRouteImport.update({
+  id: '/sub-portal',
+  path: '/sub-portal',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSubmittalsRoute = AuthenticatedSubmittalsRouteImport.update({
+  id: '/submittals',
+  path: '/submittals',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -85,9 +110,13 @@ export interface FileRoutesByFullPath {
   '/commercials': typeof AuthenticatedCommercialsRoute
   '/daywork': typeof AuthenticatedDayworkRoute
   '/drawings': typeof AuthenticatedDrawingsRoute
+  '/inspections': typeof AuthenticatedInspectionsRoute
+  '/qa-hub': typeof AuthenticatedQaHubRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/rfis': typeof AuthenticatedRfisRoute
   '/snags': typeof AuthenticatedSnagsRoute
+  '/sub-portal': typeof AuthenticatedSubPortalRoute
+  '/submittals': typeof AuthenticatedSubmittalsRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -96,9 +125,13 @@ export interface FileRoutesByTo {
   '/commercials': typeof AuthenticatedCommercialsRoute
   '/daywork': typeof AuthenticatedDayworkRoute
   '/drawings': typeof AuthenticatedDrawingsRoute
+  '/inspections': typeof AuthenticatedInspectionsRoute
+  '/qa-hub': typeof AuthenticatedQaHubRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/rfis': typeof AuthenticatedRfisRoute
   '/snags': typeof AuthenticatedSnagsRoute
+  '/sub-portal': typeof AuthenticatedSubPortalRoute
+  '/submittals': typeof AuthenticatedSubmittalsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
@@ -110,9 +143,13 @@ export interface FileRoutesById {
   '/_authenticated/commercials': typeof AuthenticatedCommercialsRoute
   '/_authenticated/daywork': typeof AuthenticatedDayworkRoute
   '/_authenticated/drawings': typeof AuthenticatedDrawingsRoute
+  '/_authenticated/inspections': typeof AuthenticatedInspectionsRoute
+  '/_authenticated/qa-hub': typeof AuthenticatedQaHubRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/rfis': typeof AuthenticatedRfisRoute
   '/_authenticated/snags': typeof AuthenticatedSnagsRoute
+  '/_authenticated/sub-portal': typeof AuthenticatedSubPortalRoute
+  '/_authenticated/submittals': typeof AuthenticatedSubmittalsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
@@ -125,9 +162,13 @@ export interface FileRouteTypes {
     | '/commercials'
     | '/daywork'
     | '/drawings'
+    | '/inspections'
+    | '/qa-hub'
     | '/returns'
     | '/rfis'
     | '/snags'
+    | '/sub-portal'
+    | '/submittals'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -136,9 +177,13 @@ export interface FileRouteTypes {
     | '/commercials'
     | '/daywork'
     | '/drawings'
+    | '/inspections'
+    | '/qa-hub'
     | '/returns'
     | '/rfis'
     | '/snags'
+    | '/sub-portal'
+    | '/submittals'
     | '/'
   id:
     | '__root__'
@@ -149,9 +194,13 @@ export interface FileRouteTypes {
     | '/_authenticated/commercials'
     | '/_authenticated/daywork'
     | '/_authenticated/drawings'
+    | '/_authenticated/inspections'
+    | '/_authenticated/qa-hub'
     | '/_authenticated/returns'
     | '/_authenticated/rfis'
     | '/_authenticated/snags'
+    | '/_authenticated/sub-portal'
+    | '/_authenticated/submittals'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -219,6 +268,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDrawingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inspections': {
+      id: '/_authenticated/inspections'
+      path: '/inspections'
+      fullPath: '/inspections'
+      preLoaderRoute: typeof AuthenticatedInspectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/qa-hub': {
+      id: '/_authenticated/qa-hub'
+      path: '/qa-hub'
+      fullPath: '/qa-hub'
+      preLoaderRoute: typeof AuthenticatedQaHubRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/returns': {
       id: '/_authenticated/returns'
       path: '/returns'
@@ -240,6 +303,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSnagsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sub-portal': {
+      id: '/_authenticated/sub-portal'
+      path: '/sub-portal'
+      fullPath: '/sub-portal'
+      preLoaderRoute: typeof AuthenticatedSubPortalRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/submittals': {
+      id: '/_authenticated/submittals'
+      path: '/submittals'
+      fullPath: '/submittals'
+      preLoaderRoute: typeof AuthenticatedSubmittalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -248,9 +325,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommercialsRoute: typeof AuthenticatedCommercialsRoute
   AuthenticatedDayworkRoute: typeof AuthenticatedDayworkRoute
   AuthenticatedDrawingsRoute: typeof AuthenticatedDrawingsRoute
+  AuthenticatedInspectionsRoute: typeof AuthenticatedInspectionsRoute
+  AuthenticatedQaHubRoute: typeof AuthenticatedQaHubRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedRfisRoute: typeof AuthenticatedRfisRoute
   AuthenticatedSnagsRoute: typeof AuthenticatedSnagsRoute
+  AuthenticatedSubPortalRoute: typeof AuthenticatedSubPortalRoute
+  AuthenticatedSubmittalsRoute: typeof AuthenticatedSubmittalsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -259,9 +340,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommercialsRoute: AuthenticatedCommercialsRoute,
   AuthenticatedDayworkRoute: AuthenticatedDayworkRoute,
   AuthenticatedDrawingsRoute: AuthenticatedDrawingsRoute,
+  AuthenticatedInspectionsRoute: AuthenticatedInspectionsRoute,
+  AuthenticatedQaHubRoute: AuthenticatedQaHubRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedRfisRoute: AuthenticatedRfisRoute,
   AuthenticatedSnagsRoute: AuthenticatedSnagsRoute,
+  AuthenticatedSubPortalRoute: AuthenticatedSubPortalRoute,
+  AuthenticatedSubmittalsRoute: AuthenticatedSubmittalsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

@@ -31,3 +31,5 @@ use the editor.
 
 - FieldBridge data access goes through `src/lib/db.ts` (`useTable` + untyped `db` client) so screens stay simple; every app page lives under `src/routes/_authenticated/` and RLS allows only signed-in users, so add new pages there.
 - Valuation and platform-fee maths live in `valuation()` in `src/lib/db.ts` (tested); UI only renders it, so fee rules have one source.
+- Construction workflow rules (who may delete, numbering, inspection result, compliance expiry, sub-claim certificate) live in `src/lib/workflow.ts` (tested); records are deletable only by their creator while still open, otherwise resolved with photo evidence via `components/fb/Workflow.tsx`.
+- The Live QA Hub (`/qa-hub`) is owner-only (RLS via `public.is_superadmin()`); its test cases live in `src/lib/qa-cases.ts` — add a case when adding a workflow.

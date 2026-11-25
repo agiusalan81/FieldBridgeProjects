@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
 import { db, useRefresh, type Row } from "@/lib/db";
 import { photoToDataUrl } from "@/lib/photo";
+import { DeleteMistake } from "./Workflow";
 
 export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string; pkg?: string; canVerify?: boolean }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -34,6 +35,7 @@ export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string;
           await update({ photo_rectified_url: await photoToDataUrl(f), status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`);
         }} />
         {s.status === "Open" && <Button className="h-11 w-full" disabled={busy} onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Upload Fixed Photo & Mark Rectified</Button>}
+        <DeleteMistake table="snags" row={s} label={s.snag_number} />
         {canVerify && s.status === "Fixed - Awaiting Re-inspection" && (
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" className="h-11" disabled={busy} onClick={() => update({ status: "Open" }, "Rejected — reopened")}>Reject</Button>

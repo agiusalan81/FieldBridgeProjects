@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import icon from "@/assets/icon-fieldbridge-projects.jpg";
-import { HardHat, LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut } from "lucide-react";
+import { HardHat, LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut, FileCheck2, ListChecks, Users, ClipboardCheck } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { QuickCreate } from "./QuickCreate";
 import { supabase } from "@/integrations/supabase/client";
+import { useMe } from "./Workflow";
 
 const nav = [
   { to: "/", label: "Control Centre", icon: LayoutDashboard },
@@ -15,7 +16,10 @@ const nav = [
   { to: "/snags", label: "Snagging", icon: Bug },
   { to: "/commercials", label: "Commercials", icon: Receipt },
   { to: "/daywork", label: "Dayworks", icon: FileSignature },
-  { to: "/addons", label: "Add-ons", icon: Puzzle, FileSignature, LogOut },
+  { to: "/submittals", label: "Submittals", icon: FileCheck2 },
+  { to: "/inspections", label: "Inspections", icon: ListChecks },
+  { to: "/sub-portal", label: "Sub Portal", icon: Users },
+  { to: "/addons", label: "Add-ons", icon: Puzzle },
 ] as const;
 
 export const ROLES = ["Project Director", "Site Agent", "Subcontractor Lead", "Lead Consultant"];
@@ -24,6 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [role, setRole] = useState(ROLES[0]!);
   const [online, setOnline] = useState(true);
   const [open, setOpen] = useState(false);
+  const me = useMe();
   useEffect(() => {
     const u = () => setOnline(navigator.onLine);
     u();
@@ -53,10 +58,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <SelectContent>{ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
             </Select>
             <Button onClick={() => setOpen(true)} className="h-9 font-semibold"><Plus className="h-4 w-4" /><span className="hidden sm:inline">New Notice / RFI / Snag</span></Button>
+            {me.isOwner && <Link to="/qa-hub" aria-label="Live QA Hub" className="rounded p-2 text-primary hover:bg-sidebar-accent"><ClipboardCheck className="h-4 w-4" /></Link>}
             <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>
-        <nav className="hidden gap-1 px-3 md:flex">
+        <nav className="hidden gap-1 overflow-x-auto px-3 md:flex">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }}
               className="flex items-center gap-2 border-b-2 border-transparent px-3 py-2 text-sm text-shell-muted hover:text-shell-foreground"
@@ -67,10 +73,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <main className="mx-auto max-w-[1500px] p-4 md:p-6">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-8 border-t-2 border-primary bg-shell md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex overflow-x-auto border-t-2 border-primary bg-shell md:hidden">
         {nav.map((n) => (
           <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }}
-            className="flex flex-col items-center gap-0.5 py-2.5 text-[10px] text-shell-muted"
+            className="flex min-w-[68px] flex-1 flex-col items-center gap-0.5 py-2.5 text-[10px] text-shell-muted"
             activeProps={{ className: "!text-primary" }}>
             <n.icon className="h-5 w-5" />{n.label.split(" ")[0]}
           </Link>
