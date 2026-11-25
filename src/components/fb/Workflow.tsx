@@ -7,7 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { db, PROJECT_ID, useRefresh, type Row } from "@/lib/db";
 import { canDelete, nextNumber, OWNER_EMAIL } from "@/lib/workflow";
-import { photoToDataUrl } from "@/lib/photo";
+import { safePhoto } from "@/lib/photo";
 
 export function useMe() {
   const [me, setMe] = useState<{ id?: string | undefined; email?: string | undefined; isOwner: boolean }>({ isOwner: false });
@@ -48,7 +48,7 @@ export function ResolveWithPhoto({ onResolve, cta = "Resolve with photo evidence
   return (
     <div className="space-y-2 rounded-md border-2 border-success p-3">
       <div className="text-xs font-bold uppercase">Formal resolution</div>
-      <input ref={ref} type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) setPhoto(await photoToDataUrl(f)); }} />
+      <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => { const p = await safePhoto(e.target.files?.[0]); if (p) setPhoto(p); e.target.value = ""; }} />
       {photo ? <img src={photo} alt="Resolution evidence" className="max-h-40 rounded" /> : <Button variant="outline" className="w-full" onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Take / upload photo</Button>}
       <Textarea placeholder="What was done to resolve it?" value={note} onChange={(e) => setNote(e.target.value)} />
       <Button className="w-full" disabled={!photo || !note.trim()} onClick={() => photo && onResolve(photo, note)}>{cta}</Button>

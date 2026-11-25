@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
 import { db, useRefresh, type Row } from "@/lib/db";
-import { photoToDataUrl } from "@/lib/photo";
+import { safePhoto } from "@/lib/photo";
 import { DeleteMistake } from "./Workflow";
 
 export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string; pkg?: string; canVerify?: boolean }) {
@@ -31,9 +31,9 @@ export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string;
         <p className="text-sm">{s.defect_description}</p>
         <div className="text-xs text-muted-foreground">{level} · {s.gridline_ref} · {pkg}</div>
         <div className="flex items-center justify-between"><StatusBadge value={s.status} /><span className={`text-xs ${overdue ? "font-bold text-destructive" : "text-muted-foreground"}`}>Rectify by {s.rectify_by_date}</span></div>
-        <input ref={ref} type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => {
-          const f = e.target.files?.[0]; if (!f) return;
-          await update({ photo_rectified_url: await photoToDataUrl(f), status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`);
+        <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => {
+          const p = await safePhoto(e.target.files?.[0]); e.target.value = ""; if (!p) return;
+          await update({ photo_rectified_url: p, status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`);
         }} />
         {s.status === "Open" && <Button className="h-11 w-full" disabled={busy} onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Upload Fixed Photo & Mark Rectified</Button>}
         <ItemChat itemType="snag" itemId={s.id} label={s.snag_number} /><DeleteMistake table="snags" row={s} label={s.snag_number} />

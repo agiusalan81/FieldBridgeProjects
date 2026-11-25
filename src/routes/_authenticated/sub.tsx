@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { db, PROJECT_ID, useTable, useRefresh, eur, byId, type Row } from "@/lib/db";
 import { nextNumber, needsClientApproval } from "@/lib/workflow";
-import { photoToDataUrl } from "@/lib/photo";
+import { safePhoto } from "@/lib/photo";
 import { pageHead } from "@/lib/head";
 
 export const Route = createFileRoute("/_authenticated/sub")({
@@ -85,7 +85,7 @@ function ExtraQuote({ sub, all, onDone }: { sub: Row; all: Row[]; onDone: () => 
     if (error) toast.error(error.message); else { toast.success("Sent for approval — don't start until approved"); onDone(); }
   }
   return <div className="space-y-2">
-    <input ref={ref} type="file" accept="image/*" capture="environment" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) setPhoto(await photoToDataUrl(f)); }} />
+    <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => { const p = await safePhoto(e.target.files?.[0]); if (p) setPhoto(p); e.target.value = ""; }} />
     {photo ? <img src={photo} alt="Extra work location" className="max-h-40 rounded" /> : <Button variant="outline" className="w-full" onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Photo of location</Button>}
     <Textarea placeholder="e.g. 4 extra double sockets on terrace" value={desc} onChange={(e) => setDesc(e.target.value)} />
     <Input type="number" placeholder="Price €" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-12 text-lg" />
