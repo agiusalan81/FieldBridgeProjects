@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
-import { ZoomIn, ZoomOut, Maximize, MousePointer2, MapPin, GitCompare } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MousePointer2, MapPin, GitCompare, Camera, ImagePlus, FileText, Loader2 } from "lucide-react";
+import { PlanViewer } from "@/components/fb/PlanViewer";
+import { useBackClose } from "@/hooks/use-back-close";
+import { findDuplicateSheet } from "@/lib/drawing";
 import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
 import { PlanSheet } from "@/components/fb/PlanSheet";
@@ -36,15 +39,12 @@ function Drawings() {
   const refresh = useRefresh();
   const [selId, setSelId] = useState<string>();
   const sel = drawings.data?.find((d) => d.id === selId) ?? drawings.data?.[0];
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
   const [mode, setMode] = useState<"pan" | "rfi" | "snag" | "observation" | "safety_hazard">("pan");
   const [compare, setCompare] = useState(false);
   const [hazard, setHazard] = useState<{ type: "observation" | "safety_hazard"; x: number; y: number } | null>(null);
   const [pinId, setPinId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [create, setCreate] = useState<{ kind: "rfi" | "snag"; x: number; y: number } | null>(null);
-  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
 
   const grouped = useMemo(() => {
@@ -56,7 +56,7 @@ function Drawings() {
   const revs = revisions.data?.filter((r) => r.drawing_id === sel?.id) ?? [];
 
   async function onClick(e: React.MouseEvent) {
-    if (!sel || mode === "pan" || drag.current?.moved || !sheetRef.current) return;
+    if (!sel || mode === "pan" || !sheetRef.current) return;
     const r = sheetRef.current.getBoundingClientRect();
     const x = +(((e.clientX - r.left) / r.width) * 100).toFixed(1);
     const y = +(((e.clientY - r.top) / r.height) * 100).toFixed(1);
@@ -74,7 +74,7 @@ function Drawings() {
             <div key={disc}>
               <h3 className="mb-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{disc}</h3>
               {list.map((d) => (
-                <button key={d.id} onClick={() => { setSelId(d.id); setZoom(1); setPan({ x: 0, y: 0 }); }}
+                <button key={d.id} onClick={() => setSelId(d.id)}
                   className={`mb-1.5 w-full rounded-md border bg-card p-3 text-left ${sel?.id === d.id ? "border-primary ring-2 ring-primary" : ""}`}>
                   <div className="flex items-center justify-between"><span className="font-mono text-sm font-semibold">{d.sheet_number}</span><span className="font-mono text-xs">{d.current_revision}</span></div>
                   <div className="text-sm">{d.sheet_title}</div>
@@ -86,45 +86,40 @@ function Drawings() {
         </aside>
         {sel && (
           <section className="min-w-0">
-            <div className="mb-2 flex flex-wrap items-center gap-1.5">
-              {(["pan", "rfi", "snag", "observation", "safety_hazard"] as const).map((m) => (
+            {(() => {
+              const modeButtons = (["pan", "rfi", "snag", "observation", "safety_hazard"] as const).map((m) => (
                 <Button key={m} size="sm" variant={mode === m ? "default" : "outline"} onClick={() => setMode(m)}>
-                  {m === "pan" ? <MousePointer2 className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}{m === "pan" ? "Pan" : pinLabel[m]}
+                  {m === "pan" ? <MousePointer2 className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}{m === "pan" ? "Move" : pinLabel[m]}
                 </Button>
-              ))}
-              <span className="mx-1 h-6 w-px bg-border" />
-              <Button size="icon" variant="outline" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(4, z + 0.25))}><ZoomIn className="h-4 w-4" /></Button>
-              <Button size="icon" variant="outline" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}><ZoomOut className="h-4 w-4" /></Button>
-              <Button size="icon" variant="outline" aria-label="Reset view" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}><Maximize className="h-4 w-4" /></Button>
-              <Button size="sm" variant={compare ? "default" : "outline"} onClick={() => setCompare((c) => !c)} disabled={revs.length < 2}>
-                <GitCompare className="h-4 w-4" />{revs.length >= 2 ? `Compare ${revs[1]?.revision_code} → ${revs[0]?.revision_code}` : "No prior rev"}
-              </Button>
-            </div>
-            <div className="relative h-[60vh] overflow-hidden rounded-md border-2 border-shell bg-muted touch-none"
-              onWheel={(e) => setZoom((z) => Math.min(4, Math.max(0.5, z - e.deltaY * 0.001)))}
-              onPointerDown={(e) => { drag.current = { x: e.clientX - pan.x, y: e.clientY - pan.y, moved: false }; }}
-              onPointerMove={(e) => { if (drag.current && mode === "pan" && e.buttons) { drag.current.moved = true; setPan({ x: e.clientX - drag.current.x, y: e.clientY - drag.current.y }); } }}
-              onPointerUp={() => setTimeout(() => (drag.current = null), 0)}
-              style={{ cursor: mode === "pan" ? "grab" : "crosshair" }}>
-              <div className="absolute inset-0 origin-center" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}>
-                <div ref={sheetRef} className="relative mx-auto aspect-[10/7] h-full max-w-full" onClick={onClick}>
-                  {sel.drawing_url ? <img src={sel.drawing_url} alt={sel.sheet_title} className="h-full w-full bg-card object-contain" draggable={false} /> : <PlanSheet seed={`${sel.sheet_number} ${sel.current_revision}`} showChanges={compare} />}
-                  {sheetPins.map((p) => (
-                    <div key={p.id} title={`${pinLabel[p.pin_type]} ${p.reference_id ?? ""}: ${p.note ?? ""}`}
-                      onClick={(e) => { e.stopPropagation(); setPinId(p.id); }}
-                      className={`group absolute -translate-x-1/2 -translate-y-full cursor-pointer ${p.status === "Resolved" ? "opacity-50" : ""}`} style={{ left: `${p.x_percent}%`, top: `${p.y_percent}%` }}>
-                      <div className={`flex h-7 min-w-7 items-center justify-center rounded-full rounded-bl-none border-2 border-card px-1 text-[10px] font-bold text-success-foreground shadow ${pinColor[p.pin_type]}`}>
-                        {p._offline ? "↥" : p.reference_id?.split("-")[1] ?? "!"}
-                      </div>
-                      <div className="pointer-events-none absolute left-8 top-0 z-10 hidden w-48 rounded bg-shell p-2 text-xs text-shell-foreground group-hover:block">
-                        <b>{pinLabel[p.pin_type]} {p.reference_id}</b><br />{p.note}
-                      </div>
-                    </div>
-                  ))}
+              ));
+              return (<>
+                <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                  {modeButtons}
+                  <span className="mx-1 h-6 w-px bg-border" />
+                  <Button size="sm" variant={compare ? "default" : "outline"} onClick={() => setCompare((c) => !c)} disabled={revs.length < 2}>
+                    <GitCompare className="h-4 w-4" />{revs.length >= 2 ? `Compare ${revs[1]?.revision_code} → ${revs[0]?.revision_code}` : "No prior rev"}
+                  </Button>
                 </div>
-              </div>
-              <div className="absolute bottom-2 left-2 rounded bg-shell px-2 py-1 font-mono text-xs text-shell-foreground">{Math.round(zoom * 100)}%</div>
-            </div>
+                <p className="mb-1 text-xs text-muted-foreground">Pinch or use two fingers to zoom and move · double-tap to zoom · tap a pin type, then tap the plan to drop it.</p>
+                <PlanViewer resetKey={sel.id} panEnabled={mode === "pan"} toolbar={modeButtons} cursor={mode === "pan" ? "grab" : "crosshair"}>
+                  <div ref={sheetRef} className="relative mx-auto aspect-[10/7] h-full max-w-full" onClick={onClick}>
+                    {sel.drawing_url ? <img src={sel.drawing_url} alt={sel.sheet_title} className="h-full w-full bg-card object-contain" draggable={false} /> : <PlanSheet seed={`${sel.sheet_number} ${sel.current_revision}`} showChanges={compare} />}
+                    {sheetPins.map((p) => (
+                      <div key={p.id} title={`${pinLabel[p.pin_type]} ${p.reference_id ?? ""}: ${p.note ?? ""}`}
+                        onClick={(e) => { e.stopPropagation(); setPinId(p.id); }}
+                        className={`group absolute -translate-x-1/2 -translate-y-full cursor-pointer ${p.status === "Resolved" ? "opacity-50" : ""}`} style={{ left: `${p.x_percent}%`, top: `${p.y_percent}%` }}>
+                        <div className={`flex h-7 min-w-7 items-center justify-center rounded-full rounded-bl-none border-2 border-card px-1 text-[10px] font-bold text-success-foreground shadow ${pinColor[p.pin_type]}`}>
+                          {p._offline ? "↥" : p.reference_id?.split("-")[1] ?? "!"}
+                        </div>
+                        <div className="pointer-events-none absolute left-8 top-0 z-10 hidden w-48 rounded bg-shell p-2 text-xs text-shell-foreground group-hover:block">
+                          <b>{pinLabel[p.pin_type]} {p.reference_id}</b><br />{p.note}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </PlanViewer>
+              </>);
+            })()}
             <div className="mt-3 rounded-md border bg-card p-3">
               <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Revision history</h3>
               <table className="w-full text-sm"><tbody>
@@ -182,9 +177,10 @@ function HazardDialog({ drawing, spot, onClose }: { drawing: Row; spot: { type: 
 
 function PinInspector({ pin, onClose }: { pin?: Row; onClose: () => void }) {
   const refresh = useRefresh();
+  useBackClose(!!pin, onClose);
   return (
     <Sheet open={!!pin} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
+      <SheetContent className="w-full overflow-y-auto overscroll-contain sm:max-w-md" style={{ touchAction: "pan-y" }}>
         {pin && (<>
           <SheetHeader><SheetTitle className="font-display text-2xl uppercase">{pinLabel[pin.pin_type]} {pin.reference_id ?? ""}</SheetTitle></SheetHeader>
           <div className="space-y-3 px-4 pb-6 text-sm">
@@ -203,6 +199,8 @@ function PinInspector({ pin, onClose }: { pin?: Row; onClose: () => void }) {
               }} />
             ))}
             {!pin._offline && <DeleteMistake table="drawing_pins" row={pin} label={`pin ${pin.reference_id ?? ""}`} onDone={onClose} />}
+            <Button variant="outline" className="h-11 w-full" onClick={onClose}>Back to drawing</Button>
+            <div className="h-24" aria-hidden />
           </div>
         </>)}
       </SheetContent>
@@ -215,47 +213,106 @@ const DISCIPLINES = ["Architectural", "Structural", "MEP - Mechanical", "MEP - E
 function AddDrawing({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (o: boolean) => void; onCreated: (id: string) => void }) {
   const refresh = useRefresh();
   const levels = useTable("project_levels_zones", { order: "sequence_order" });
-  const [f, setF] = useState({ discipline: DISCIPLINES[0] ?? "Architectural", sheet_number: "", sheet_title: "", level_code: "", rev: "P01", reason: "First issue" });
+  const drawings = useTable("drawings", { order: "sheet_number" });
+  const draftKey = `fb-drawing-draft:${PROJECT_ID}`;
+  const blank = { discipline: DISCIPLINES[0] ?? "Architectural", sheet_number: "", sheet_title: "", level_code: "", rev: "P01", reason: "First issue" };
+  const [f, setF] = useState(blank);
   const [file, setFile] = useState<string>();
   const [pdf, setPdf] = useState<{ file: File; pages: number; page: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const [dup, setDup] = useState<Row | null>(null);
+  const camRef = useRef<HTMLInputElement>(null), galRef = useRef<HTMLInputElement>(null), pdfRef = useRef<HTMLInputElement>(null);
+  useBackClose(open, () => onOpenChange(false));
+  useEffect(() => {
+    if (!open) return;
+    try { const d = localStorage.getItem(draftKey); if (d) setF({ ...blank, ...JSON.parse(d) }); } catch { /* ignore bad draft */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+  function update(next: typeof f) { setF(next); setDup(null); try { localStorage.setItem(draftKey, JSON.stringify(next)); } catch { /* storage full */ } }
   async function renderPage(fl: File, page: number, pages: number) {
     setBusy(true);
     try { const { pdfPageToDataUrl } = await import("@/lib/pdf"); setFile(await pdfPageToDataUrl(fl, page)); setPdf({ file: fl, pages, page }); }
     catch { toast.error("Could not read that PDF"); } finally { setBusy(false); }
   }
-  async function pick(fl?: File) {
+  async function pick(fl: File | undefined, input: HTMLInputElement) {
+    input.value = "";
     if (!fl) return;
     if (fl.type === "application/pdf" || fl.name.toLowerCase().endsWith(".pdf")) {
       const { pdfPageCount } = await import("@/lib/pdf");
       try { await renderPage(fl, 1, await pdfPageCount(fl)); } catch { toast.error("Could not read that PDF"); }
-    } else { setPdf(null); setFile(await photoToDataUrl(fl, 2400)); }
+    } else {
+      setBusy(true);
+      try { setPdf(null); setFile(await photoToDataUrl(fl, 2400)); } catch { toast.error("Could not read that photo"); } finally { setBusy(false); }
+    }
+  }
+  function done(id: string, msg: string) {
+    try { localStorage.removeItem(draftKey); } catch { /* ignore */ }
+    toast.success(msg); refresh("drawings", "drawing_revisions"); onCreated(id); setF(blank); setFile(undefined); setPdf(null); setDup(null); onOpenChange(false);
+  }
+  async function run(task: () => Promise<void>) {
+    if (savingRef.current) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) { toast.error("No signal — drawings need a connection to upload. Your details are kept."); return; }
+    savingRef.current = true; setSaving(true);
+    try { await task(); } catch (e) { toast.error(e instanceof Error ? e.message : "Could not save. Your details are kept."); }
+    finally { savingRef.current = false; setSaving(false); }
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const { data, error } = await db.from("drawings").insert({ project_id: PROJECT_ID, discipline: f.discipline, sheet_number: f.sheet_number, sheet_title: f.sheet_title, level_code: f.level_code || null, current_revision: f.rev, status: "For Construction", drawing_url: file ?? null }).select("id").single();
-    if (error) { toast.error(error.message); return; }
-    await db.from("drawing_revisions").insert({ drawing_id: data.id, revision_code: f.rev, date_issued: new Date().toISOString().slice(0, 10), reason_for_issue: f.reason, revision_file_url: file ?? null });
-    toast.success(`${f.sheet_number} added`); refresh("drawings", "drawing_revisions"); onCreated(data.id); onOpenChange(false);
+    const existing = findDuplicateSheet(drawings.data, f.sheet_number);
+    if (existing) { setDup(existing); return; }
+    await run(async () => {
+      const { data, error } = await db.from("drawings").insert({ project_id: PROJECT_ID, discipline: f.discipline, sheet_number: f.sheet_number.trim(), sheet_title: f.sheet_title, level_code: f.level_code || null, current_revision: f.rev, status: "For Construction", drawing_url: file ?? null }).select("id").single();
+      if (error) throw error;
+      await db.from("drawing_revisions").insert({ drawing_id: data.id, revision_code: f.rev, date_issued: new Date().toISOString().slice(0, 10), reason_for_issue: f.reason, revision_file_url: file ?? null });
+      done(data.id, `${f.sheet_number} added`);
+    });
+  }
+  async function addRevision(existing: Row) {
+    if (f.rev.trim().toLowerCase() === String(existing.current_revision).trim().toLowerCase()) { toast.error(`${existing.sheet_number} is already at ${existing.current_revision}. Enter the new revision code.`); return; }
+    await run(async () => {
+      const patch: Record<string, unknown> = { current_revision: f.rev, sheet_title: f.sheet_title || existing.sheet_title, level_code: f.level_code || existing.level_code };
+      if (file) patch["drawing_url"] = file;
+      const { error } = await db.from("drawings").update(patch).eq("id", existing.id);
+      if (error) throw error;
+      await db.from("drawing_revisions").insert({ drawing_id: existing.id, revision_code: f.rev, date_issued: new Date().toISOString().slice(0, 10), reason_for_issue: f.reason, revision_file_url: file ?? null });
+      done(existing.id, `${existing.sheet_number} updated to ${f.rev}`);
+    });
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto overscroll-contain">
         <DialogHeader><DialogTitle className="font-display uppercase">Add drawing</DialogTitle></DialogHeader>
         <form onSubmit={save} className="space-y-2">
-          <select aria-label="Discipline" className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={f.discipline} onChange={(e) => setF({ ...f, discipline: e.target.value })}>{DISCIPLINES.map((d) => <option key={d}>{d}</option>)}</select>
-          <Input required placeholder="Sheet number e.g. A-104" value={f.sheet_number} onChange={(e) => setF({ ...f, sheet_number: e.target.value })} />
-          <Input required placeholder="Sheet title" value={f.sheet_title} onChange={(e) => setF({ ...f, sheet_title: e.target.value })} />
-          <select aria-label="Level" className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={f.level_code} onChange={(e) => setF({ ...f, level_code: e.target.value })}><option value="">No specific level</option>{levels.data?.map((l) => <option key={l.id} value={l.level_code}>{l.level_code}</option>)}</select>
-          <div className="grid grid-cols-2 gap-2"><Input required placeholder="Revision" value={f.rev} onChange={(e) => setF({ ...f, rev: e.target.value })} /><Input placeholder="Reason for issue" value={f.reason} onChange={(e) => setF({ ...f, reason: e.target.value })} /></div>
-          <label className="block text-sm">Drawing file (PDF, PNG or JPG)<Input type="file" accept="application/pdf,image/*" onChange={(e) => pick(e.target.files?.[0])} /></label>
+          <select aria-label="Discipline" className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={f.discipline} onChange={(e) => update({ ...f, discipline: e.target.value })}>{DISCIPLINES.map((d) => <option key={d}>{d}</option>)}</select>
+          <Input required placeholder="Sheet number e.g. A-104" value={f.sheet_number} onChange={(e) => update({ ...f, sheet_number: e.target.value })} />
+          <Input required placeholder="Sheet title" value={f.sheet_title} onChange={(e) => update({ ...f, sheet_title: e.target.value })} />
+          <select aria-label="Level" className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={f.level_code} onChange={(e) => update({ ...f, level_code: e.target.value })}><option value="">No specific level</option>{levels.data?.map((l) => <option key={l.id} value={l.level_code}>{l.level_code}</option>)}</select>
+          <div className="grid grid-cols-2 gap-2"><Input required placeholder="Revision" value={f.rev} onChange={(e) => update({ ...f, rev: e.target.value })} /><Input placeholder="Reason for issue" value={f.reason} onChange={(e) => update({ ...f, reason: e.target.value })} /></div>
+          <input ref={camRef} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => pick(e.target.files?.[0], e.target)} />
+          <input ref={galRef} type="file" accept="image/*" className="sr-only" onChange={(e) => pick(e.target.files?.[0], e.target)} />
+          <input ref={pdfRef} type="file" accept="application/pdf" className="sr-only" onChange={(e) => pick(e.target.files?.[0], e.target)} />
+          <div className="text-sm">Drawing file</div>
+          <div className="grid grid-cols-3 gap-2">
+            <Button type="button" variant="outline" className="h-11 px-1" disabled={busy || saving} onClick={() => camRef.current?.click()}><Camera className="h-4 w-4" />Take photo</Button>
+            <Button type="button" variant="outline" className="h-11 px-1" disabled={busy || saving} onClick={() => galRef.current?.click()}><ImagePlus className="h-4 w-4" />Gallery</Button>
+            <Button type="button" variant="outline" className="h-11 px-1" disabled={busy || saving} onClick={() => pdfRef.current?.click()}><FileText className="h-4 w-4" />PDF</Button>
+          </div>
           {pdf && pdf.pages > 1 && <label className="block text-sm">PDF page ({pdf.pages} in set)<select className="h-9 w-full rounded-md border bg-background px-2" value={pdf.page} onChange={(e) => renderPage(pdf.file, Number(e.target.value), pdf.pages)}>{Array.from({ length: pdf.pages }, (_, i) => <option key={i} value={i + 1}>Page {i + 1}</option>)}</select></label>}
-          {busy && <p className="text-xs text-muted-foreground">Rendering PDF sheet…</p>}
+          {busy && <p className="text-xs text-muted-foreground">Reading file…</p>}
           {file && <img src={file} alt="Preview" className="max-h-32 rounded border" />}
-          <Button type="submit" className="w-full" disabled={busy}>Add to register</Button>
+          {dup ? (
+            <div role="alert" className="space-y-2 rounded-md border-2 border-primary p-3 text-sm">
+              <p><b>{dup.sheet_number}</b> is already in the register (currently {dup.current_revision}). Do you want to issue this as a new revision of that sheet?</p>
+              <Button type="button" className="w-full" disabled={saving || busy} onClick={() => addRevision(dup)}>{saving ? <><Loader2 className="h-4 w-4 animate-spin" />Saving…</> : `Issue as revision ${f.rev}`}</Button>
+              <Button type="button" variant="outline" className="w-full" disabled={saving} onClick={() => setDup(null)}>Change sheet number</Button>
+            </div>
+          ) : (
+            <Button type="submit" className="w-full" disabled={busy || saving}>{saving ? <><Loader2 className="h-4 w-4 animate-spin" />Adding drawing to register…</> : "Add to register"}</Button>
+          )}
         </form>
       </DialogContent>
     </Dialog>
   );
 }
-
