@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import icon from "@/assets/icon-fieldbridge-projects.jpg";
 import { LayoutDashboard, Layers, ClipboardList, HelpCircle, Bug, Receipt, Plus, Wifi, WifiOff, Puzzle, FileSignature, LogOut, FileCheck2, ListChecks, Users, ClipboardCheck, Settings, Truck, Smartphone, ChevronDown, Menu, X, Calculator } from "lucide-react";
@@ -11,6 +12,7 @@ import { QuickCreate } from "./QuickCreate";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "./Workflow";
 import { db, PROJECT_ID, setActiveProject, useTable } from "@/lib/db";
+import { initializeAccountAccess } from "@/lib/account-access";
 
 type Item = { to: string; label: string; icon: typeof Layers };
 const HUBS: { hub: string; roles: string[]; items: Item[] }[] = [
@@ -47,11 +49,28 @@ const visible = (role: string) => HUBS.filter((h) => h.roles.includes("all") || 
   .filter((h) => h.items.length);
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState(ROLES[0]!);
+  const [role, setRole] = useState("Project Director");
   const [online, setOnline] = useState(true);
   const [open, setOpen] = useState(false);
   const [drawer, setDrawer] = useState(false);
-  useEffect(() => { void syncOnboarding(); }, []);
+  const queryClient = useQueryClient();
+  const [accessReady, setAccessReady] = useState(false);
+  const [accessError, setAccessError] = useState<string>();
+  const [accessAttempt, setAccessAttempt] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    setAccessError(undefined);
+    void (async () => {
+      try {
+        await syncOnboarding();
+        await queryClient.invalidateQueries();
+        if (!cancelled) setAccessReady(true);
+      } catch {
+        if (!cancelled) setAccessError("We couldn't confirm your project access. Please try again.");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [queryClient, accessAttempt]);
   const [newProject, setNewProject] = useState(false);
   const me = useMe();
   const projects = useTable("projects", { order: "project_number" });
@@ -65,6 +84,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, []);
   const hubs = visible(role);
   const nav = <SideNav hubs={hubs} onPick={() => setDrawer(false)} />;
+
+  if (!accessReady) return (
+    <main className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="space-y-3 text-center">
+        <p role="status" className="text-sm text-muted-foreground">{accessError ?? "Opening your project…"}</p>
+        {accessError && <Button onClick={() => setAccessAttempt((attempt) => attempt + 1)}>Try again</Button>}
+      </div>
+    </main>
+  );
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -200,12 +228,13 @@ export function PageTitle({ title, sub, children }: { title: string; sub?: strin
 
 /** After sign-in: save the sign-up survey (kept in account metadata until confirmed) and accept pending team invites. */
 async function syncOnboarding() {
-  const { data } = await supabase.auth.getUser();
-  const u = data.user; if (!u) return;
+  const { data, error } = await supabase.auth.getUser();
+  const u = data.user;
+  if (error || !u) throw new Error("Sign in to confirm account access");
+  const n = await initializeAccountAccess(db);
   const m = (u.user_metadata ?? {}) as Record<string, unknown>;
   if (m["first_name"]) {
     await db.from("signup_profiles").upsert({ user_id: u.id, email: u.email, first_name: m["first_name"], last_name: m["last_name"] ?? "", company_name: m["company_name"] ?? "", phone: m["phone"] ?? null, organisation_type: m["organisation_type"] ?? null, job_role: m["job_role"] ?? null, team_size: m["team_size"] ?? null, problems: m["problems"] ?? [], reason: m["reason"] ?? null }, { onConflict: "user_id", ignoreDuplicates: true });
   }
-  const { data: n } = await db.rpc("claim_invites");
-  if (n > 0) { toast.success("You've joined the project team"); window.location.reload(); }
+  if (n > 0) toast.success("Your project access is ready");
 }
