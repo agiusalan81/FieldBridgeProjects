@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ItemChat } from "@/components/fb/Collab";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MapPin, CalendarClock, Clock } from "lucide-react";
@@ -77,6 +78,7 @@ function Rfis() {
               </div>
               <div><div className="text-xs font-bold uppercase text-muted-foreground">Query</div><p className="text-sm">{sel.query_details}</p></div>
               <div className="flex flex-wrap gap-2">
+                <ItemChat itemType="rfi" itemId={sel.id} label={sel.rfi_number} />
                 <DeleteMistake table="rfis" row={sel} label={sel.rfi_number} onDone={() => setSelId(null)} />
                 {sel.cost_impact && sel.cost_impact !== "None" && <ToVariation source="rfi" sourceId={sel.id} linkTable="rfis" title={`${sel.rfi_number}: ${sel.title}`} scope={sel.official_response ?? sel.query_details} eot={sel.programme_impact_days ?? undefined} disabled={!!sel.variation_id} />}
               </div>

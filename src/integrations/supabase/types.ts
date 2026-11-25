@@ -433,6 +433,47 @@ export type Database = {
           },
         ]
       }
+      item_messages: {
+        Row: {
+          author_email: string | null
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          item_id: string
+          item_type: string
+          project_id: string
+        }
+        Insert: {
+          author_email?: string | null
+          author_id?: string
+          body: string
+          created_at?: string
+          id?: string
+          item_id: string
+          item_type: string
+          project_id: string
+        }
+        Update: {
+          author_email?: string | null
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          item_type?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_messages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_applications: {
         Row: {
           application_number: number
@@ -814,6 +855,89 @@ export type Database = {
           },
           {
             foreignKeyName: "rfis_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signoff_requests: {
+        Row: {
+          amount: number | null
+          created_at: string
+          created_by: string | null
+          decision_note: string | null
+          expires_at: string
+          id: string
+          item_id: string
+          item_type: string
+          photos: Json
+          project_id: string
+          signature_data_url: string | null
+          signed_at: string | null
+          signed_ip: string | null
+          signed_name: string | null
+          signed_user_agent: string | null
+          signer_email: string | null
+          signer_name: string
+          signer_role: string | null
+          status: string
+          summary: string | null
+          title: string
+          token: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          decision_note?: string | null
+          expires_at?: string
+          id?: string
+          item_id: string
+          item_type: string
+          photos?: Json
+          project_id: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_name?: string | null
+          signed_user_agent?: string | null
+          signer_email?: string | null
+          signer_name: string
+          signer_role?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          token?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          decision_note?: string | null
+          expires_at?: string
+          id?: string
+          item_id?: string
+          item_type?: string
+          photos?: Json
+          project_id?: string
+          signature_data_url?: string | null
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_name?: string | null
+          signed_user_agent?: string | null
+          signer_email?: string | null
+          signer_name?: string
+          signer_role?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signoff_requests_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"

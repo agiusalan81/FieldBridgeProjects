@@ -211,6 +211,20 @@ function AddDrawing({ open, onOpenChange, onCreated }: { open: boolean; onOpenCh
   const levels = useTable("project_levels_zones", { order: "sequence_order" });
   const [f, setF] = useState({ discipline: DISCIPLINES[0]!, sheet_number: "", sheet_title: "", level_code: "", rev: "P01", reason: "First issue" });
   const [file, setFile] = useState<string>();
+  const [pdf, setPdf] = useState<{ file: File; pages: number; page: number } | null>(null);
+  const [busy, setBusy] = useState(false);
+  async function renderPage(fl: File, page: number, pages: number) {
+    setBusy(true);
+    try { const { pdfPageToDataUrl } = await import("@/lib/pdf"); setFile(await pdfPageToDataUrl(fl, page)); setPdf({ file: fl, pages, page }); }
+    catch { toast.error("Could not read that PDF"); } finally { setBusy(false); }
+  }
+  async function pick(fl?: File) {
+    if (!fl) return;
+    if (fl.type === "application/pdf" || fl.name.toLowerCase().endsWith(".pdf")) {
+      const { pdfPageCount } = await import("@/lib/pdf");
+      try { await renderPage(fl, 1, await pdfPageCount(fl)); } catch { toast.error("Could not read that PDF"); }
+    } else { setPdf(null); setFile(await photoToDataUrl(fl, 2400)); }
+  }
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const { data, error } = await db.from("drawings").insert({ project_id: PROJECT_ID, discipline: f.discipline, sheet_number: f.sheet_number, sheet_title: f.sheet_title, level_code: f.level_code || null, current_revision: f.rev, status: "For Construction", drawing_url: file ?? null }).select("id").single();
@@ -228,9 +242,11 @@ function AddDrawing({ open, onOpenChange, onCreated }: { open: boolean; onOpenCh
           <Input required placeholder="Sheet title" value={f.sheet_title} onChange={(e) => setF({ ...f, sheet_title: e.target.value })} />
           <select aria-label="Level" className="h-9 w-full rounded-md border bg-background px-2 text-sm" value={f.level_code} onChange={(e) => setF({ ...f, level_code: e.target.value })}><option value="">No specific level</option>{levels.data?.map((l) => <option key={l.id} value={l.level_code}>{l.level_code}</option>)}</select>
           <div className="grid grid-cols-2 gap-2"><Input required placeholder="Revision" value={f.rev} onChange={(e) => setF({ ...f, rev: e.target.value })} /><Input placeholder="Reason for issue" value={f.reason} onChange={(e) => setF({ ...f, reason: e.target.value })} /></div>
-          <label className="block text-sm">Drawing image (PNG/JPG of the sheet)<Input type="file" accept="image/*" onChange={async (e) => { const fl = e.target.files?.[0]; if (fl) setFile(await photoToDataUrl(fl, 2400)); }} /></label>
+          <label className="block text-sm">Drawing file (PDF, PNG or JPG)<Input type="file" accept="application/pdf,image/*" onChange={(e) => pick(e.target.files?.[0])} /></label>
+          {pdf && pdf.pages > 1 && <label className="block text-sm">PDF page ({pdf.pages} in set)<select className="h-9 w-full rounded-md border bg-background px-2" value={pdf.page} onChange={(e) => renderPage(pdf.file, Number(e.target.value), pdf.pages)}>{Array.from({ length: pdf.pages }, (_, i) => <option key={i} value={i + 1}>Page {i + 1}</option>)}</select></label>}
+          {busy && <p className="text-xs text-muted-foreground">Rendering PDF sheet…</p>}
           {file && <img src={file} alt="Preview" className="max-h-32 rounded border" />}
-          <Button type="submit" className="w-full">Add to register</Button>
+          <Button type="submit" className="w-full" disabled={busy}>Add to register</Button>
         </form>
       </DialogContent>
     </Dialog>

@@ -29,6 +29,7 @@ import { Route as AuthenticatedSubRouteImport } from './routes/_authenticated/su
 import { Route as AuthenticatedSubPortalRouteImport } from './routes/_authenticated/sub-portal'
 import { Route as AuthenticatedSubmittalsRouteImport } from './routes/_authenticated/submittals'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
+import { Route as SignTokenRouteImport } from './routes/sign/$token'
 import { Route as AuthenticatedCertificateIdRouteImport } from './routes/_authenticated/certificate/$id'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -132,6 +133,11 @@ const AuthenticatedSuppliersRoute = AuthenticatedSuppliersRouteImport.update({
   path: '/suppliers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const SignTokenRoute = SignTokenRouteImport.update({
+  id: '/sign/$token',
+  path: '/sign/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedCertificateIdRoute =
   AuthenticatedCertificateIdRouteImport.update({
     id: '/certificate/$id',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/sub-portal': typeof AuthenticatedSubPortalRoute
   '/submittals': typeof AuthenticatedSubmittalsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
+  '/sign/$token': typeof SignTokenRoute
   '/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
 export interface FileRoutesByTo {
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/sub-portal': typeof AuthenticatedSubPortalRoute
   '/submittals': typeof AuthenticatedSubmittalsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
+  '/sign/$token': typeof SignTokenRoute
   '/': typeof AuthenticatedIndexRoute
   '/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/sub-portal': typeof AuthenticatedSubPortalRoute
   '/_authenticated/submittals': typeof AuthenticatedSubmittalsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
+  '/sign/$token': typeof SignTokenRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/certificate/$id': typeof AuthenticatedCertificateIdRoute
 }
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/sub-portal'
     | '/submittals'
     | '/suppliers'
+    | '/sign/$token'
     | '/certificate/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/sub-portal'
     | '/submittals'
     | '/suppliers'
+    | '/sign/$token'
     | '/'
     | '/certificate/$id'
   id:
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sub-portal'
     | '/_authenticated/submittals'
     | '/_authenticated/suppliers'
+    | '/sign/$token'
     | '/_authenticated/'
     | '/_authenticated/certificate/$id'
   fileRoutesById: FileRoutesById
@@ -281,6 +293,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   HomeRoute: typeof HomeRoute
+  SignTokenRoute: typeof SignTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuppliersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/sign/$token': {
+      id: '/sign/$token'
+      path: '/sign/$token'
+      fullPath: '/sign/$token'
+      preLoaderRoute: typeof SignTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/certificate/$id': {
       id: '/_authenticated/certificate/$id'
       path: '/certificate/$id'
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   HomeRoute: HomeRoute,
+  SignTokenRoute: SignTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

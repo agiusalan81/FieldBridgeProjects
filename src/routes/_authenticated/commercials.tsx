@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ItemChat, RequestSignoff } from "@/components/fb/Collab";
 import { toast } from "sonner";
 import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
@@ -56,7 +57,7 @@ function Commercials() {
                 <td className="py-3 text-right font-mono text-success">{x.approved_employer_amount ? eur(x.approved_employer_amount - x.subcontractor_quotation) : "—"}</td>
                 <td className="py-3 text-center font-mono">{x.eot_days_claimed}d / {x.eot_days_granted}d</td>
                 <td className="py-3"><StatusBadge value={x.status} /></td>
-                <td className="py-3 pr-3">{x.status === "Potential" && <Button size="sm" variant="outline" onClick={async () => { const { error } = await db.from("variations").update({ status: "Submitted" }).eq("id", x.id); if (error) toast.error(error.message); else { toast.success("Submitted to client for approval"); refresh("variations"); } }}>Price & submit</Button>}{x.status.startsWith("Submitted") && <div className="flex gap-1"><Button size="sm" onClick={() => decide(x.id, x, true)}>Approve</Button><Button size="sm" variant="outline" onClick={() => decide(x.id, x, false)}>Reject</Button></div>}</td>
+                <td className="py-3 pr-3"><div className="mb-1 flex flex-wrap gap-1"><ItemChat itemType="variation" itemId={x.id} label={x.variation_number} />{x.status.startsWith("Submitted") && <RequestSignoff itemType="Variation" itemId={x.id} title={`${x.variation_number}: ${x.title}`} summary={x.scope_description} amount={x.claimed_contractor_amount ?? x.subcontractor_quotation} />}</div>{x.status === "Potential" && <Button size="sm" variant="outline" onClick={async () => { const { error } = await db.from("variations").update({ status: "Submitted" }).eq("id", x.id); if (error) toast.error(error.message); else { toast.success("Submitted to client for approval"); refresh("variations"); } }}>Price & submit</Button>}{x.status.startsWith("Submitted") && <div className="flex gap-1"><Button size="sm" onClick={() => decide(x.id, x, true)}>Approve</Button><Button size="sm" variant="outline" onClick={() => decide(x.id, x, false)}>Reject</Button></div>}</td>
               </tr>
             ))}
           </tbody>

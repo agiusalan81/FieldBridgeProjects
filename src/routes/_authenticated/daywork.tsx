@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ItemChat, RequestSignoff } from "@/components/fb/Collab";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageTitle } from "@/components/fb/AppShell";
@@ -66,7 +67,7 @@ function Daywork() {
               </div>
               <div className="text-right"><div className="font-display text-2xl font-bold">{eur(dayworkTotal(r))}</div>
                 {r.status !== "Signed" && <Button size="sm" className="mt-1" onClick={() => setSignId(r.id)}>Sign off</Button>}
-                <div className="mt-1 flex flex-wrap justify-end gap-1">{r.status === "Signed" && <ToVariation source="daywork" sourceId={r.id} linkTable="daywork_sheets" title={`Daywork ${r.sheet_number}: ${r.description}`} amount={dayworkTotal(r)} disabled={!!r.variation_id} />}<DeleteMistake table="daywork_sheets" row={r} label={r.sheet_number} /></div>
+                <div className="mt-1 flex flex-wrap justify-end gap-1">{r.status === "Signed" && <ToVariation source="daywork" sourceId={r.id} linkTable="daywork_sheets" title={`Daywork ${r.sheet_number}: ${r.description}`} amount={dayworkTotal(r)} disabled={!!r.variation_id} />}<ItemChat itemType="daywork" itemId={r.id} label={r.sheet_number} />{r.status !== "Signed" && <RequestSignoff itemType="Daywork" itemId={r.id} title={`Daywork ${r.sheet_number}`} summary={r.description} amount={dayworkTotal(r)} />}<DeleteMistake table="daywork_sheets" row={r} label={r.sheet_number} /></div>
               </div>
             </div>
           ))}

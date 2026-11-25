@@ -24,4 +24,8 @@ export const QA_CASES: QaCase[] = [
   { code: "FBP-TEAM-01", module: "Team", title: "Invite member joins on sign-in", steps: "Settings → Invite email as Member → that person signs up with the same email → listed as Accepted and sees the project.", route: "/settings" },
   { code: "FBP-CERT-01", module: "Commercials", title: "Printable payment certificate", steps: "Valuations → Certificate on an application → figures match the row → Print / Save as PDF.", route: "/commercials" },
   { code: "FBP-EST-01", module: "Estimate", title: "Budget vs committed variance", steps: "Estimate & Budget → set committed above budget on a line → red overspend; totals include approved variations.", route: "/estimate" },
+  { code: "FBP-DWG-03", module: "Drawings", title: "Upload a multi-page PDF drawing", steps: "Add drawing → choose a PDF → pick a page → Add → sheet shows sharp and pins can be placed and zoomed.", route: "/drawings" },
+  { code: "FBP-SGN-01", module: "Remote sign-off", title: "Off-site approval link", steps: "Daywork (unsigned) or submitted variation → Remote sign-off → create link → open it in a private window → type name, sign, Approve → button shows Remote: Approved with signature.", route: "/daywork" },
+  { code: "FBP-SGN-02", module: "Remote sign-off", title: "Link can't be reused", steps: "Open an already signed link → shows who signed and when, no sign buttons.", route: "/daywork" },
+  { code: "FBP-CHT-01", module: "Chat", title: "Item chat updates live", steps: "Open Chat on an RFI in two browsers → send a message → appears in the other without reload.", route: "/rfis" },
 ];
