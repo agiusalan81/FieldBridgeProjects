@@ -1623,6 +1623,10 @@ export type Database = {
     }
     Functions: {
       claim_invites: { Args: never; Returns: number }
+      enroll_confirmed_account: {
+        Args: { account_id: string }
+        Returns: number
+      }
       is_project_manager: { Args: never; Returns: boolean }
       is_project_member: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
