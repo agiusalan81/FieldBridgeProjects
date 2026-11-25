@@ -5,16 +5,29 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const db = supabase as any;
 
-export const PROJECT_ID = "00000000-0000-0000-0000-000000000001";
+export const DEFAULT_PROJECT_ID = "00000000-0000-0000-0000-000000000001";
+const ACTIVE_KEY = "fbp.activeProject";
+/** Active project for every screen (live binding; switching reloads the app). */
+export let PROJECT_ID: string =
+  (typeof window !== "undefined" && window.localStorage.getItem(ACTIVE_KEY)) || DEFAULT_PROJECT_ID;
+export function setActiveProject(id: string) {
+  PROJECT_ID = id;
+  window.localStorage.setItem(ACTIVE_KEY, id);
+  window.location.assign("/");
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Row = any;
 
+/** Tables carrying project_id are always scoped to the active project. */
+const PROJECT_SCOPED = new Set(["daily_site_diaries", "daywork_sheets", "drawings", "payment_applications", "project_addons", "project_levels_zones", "rfis", "site_inspections", "snags", "subcontractor_claims", "subcontractors", "submittals", "trade_packages", "variations", "extra_work_quotes"]);
+
 export function useTable(table: string, opts: { order?: string; asc?: boolean; filter?: [string, string] } = {}) {
   return useQuery<Row[]>({
-    queryKey: [table, opts],
+    queryKey: [table, opts, PROJECT_SCOPED.has(table) ? PROJECT_ID : null],
     queryFn: async () => {
       let q = db.from(table).select("*");
+      if (PROJECT_SCOPED.has(table)) q = q.eq("project_id", PROJECT_ID);
       if (opts.filter) q = q.eq(opts.filter[0], opts.filter[1]);
       if (opts.order) q = q.order(opts.order, { ascending: opts.asc ?? true });
       const { data, error } = await q;

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { db, useTable, useRefresh, eur, finalAccount } from "@/lib/db";
+import { db, PROJECT_ID, useTable, useRefresh, eur, finalAccount } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 import { AddonNudge } from "@/components/fb/Addons";
 import { PaymentApplications } from "@/components/fb/PaymentApplications";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/commercials")({
 });
 
 function Commercials() {
-  const p = useTable("projects").data?.[0];
+  const p = useTable("projects").data?.find((x) => x.id === PROJECT_ID);
   const vars = useTable("variations", { order: "variation_number" });
   const pkgs = useTable("trade_packages", { order: "package_code" });
   const refresh = useRefresh();

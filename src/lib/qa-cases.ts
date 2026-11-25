@@ -16,4 +16,8 @@ export const QA_CASES: QaCase[] = [
   { code: "FBP-SUB-01", module: "Sub Portal", title: "Expired RAMS blocks claims", steps: "Pick the subcontractor with expired RAMS → red banner, Submit claim blocked → renew → unblocked.", route: "/sub-portal" },
   { code: "FBP-SUB-02", module: "Sub Portal", title: "Certify claim & send to Books", steps: "Certify a lower amount with notes → due amount less retention → Send to FieldBridge Books.", route: "/sub-portal" },
   { code: "FBP-SEC-01", module: "Security", title: "Others can't delete your records", steps: "Sign in as another user → no Delete button on records you created.", route: "/rfis" },
+  { code: "FBP-PRJ-01", module: "Projects", title: "Create & switch project", steps: "Header project switcher → + New project → fill in → app reopens on the new project.", route: "/" },
+  { code: "FBP-SET-01", module: "Settings", title: "Client approval limit & sponsored passes", steps: "Settings → change approval limit and tick Sponsor passes → Save → values persist after reload.", route: "/settings" },
+  { code: "FBP-SUP-01", module: "Suppliers", title: "Incumbent shown per package", steps: "Suppliers → package list shows awarded subcontractor; add a supplier.", route: "/suppliers" },
+  { code: "FBP-LITE-01", module: "Sub Lite", title: "Quick extra-work quote → approve → variation", steps: "Sub Lite → Extra works → photo, description, amount → Send. PM approves in inbox → variation appears in Commercials; above limit shows 'Client sign-off'.", route: "/sub" },
 ];

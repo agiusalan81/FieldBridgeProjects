@@ -47,3 +47,8 @@ export const INSPECTION_TEMPLATES: Record<string, string[]> = {
   "Firestopping": ["Approved product used", "Penetrations sealed full depth", "Labels with product & date", "Photos taken"],
   "Waterproofing Membrane": ["Substrate clean & dry", "Laps per manufacturer", "Flood test passed", "Protection board fitted"],
 };
+
+/** Extra work / variations above the client's threshold need the client's own sign-off; at or below, the PM can approve. */
+export function needsClientApproval(amount: number, threshold: number) {
+  return Number(amount) > Number(threshold);
+}

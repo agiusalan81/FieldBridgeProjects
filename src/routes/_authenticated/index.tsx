@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CloudRain, Thermometer, Mountain, Users, HelpCircle, Bug, Receipt, CalendarClock, Gauge, AlertTriangle } from "lucide-react";
 import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
-import { useTable, byId, eur, isOverdue, finalAccount } from "@/lib/db";
+import { useTable, byId, eur, isOverdue, finalAccount, PROJECT_ID } from "@/lib/db";
 import { pageHead } from "@/lib/head";
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -32,7 +32,7 @@ function Dashboard() {
   const pkgs = byId(useTable("trade_packages").data);
   const lv = byId(levels.data);
 
-  const p = projects.data?.[0];
+  const p = projects.data?.find((x) => x.id === PROJECT_ID) ?? projects.data?.[0];
   const diary = diaries.data?.[0];
   const todays = (returns.data ?? []).filter((r) => r.daily_site_diary_id === diary?.id);
   const headcount = todays.reduce((s, r) => s + r.operative_count, 0);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { canDelete, nextNumber, inspectionResult, complianceStatus, claimCertificate } from "./workflow";
+import { canDelete, nextNumber, inspectionResult, complianceStatus, claimCertificate, needsClientApproval } from "./workflow";
 
 describe("workflow rules", () => {
   it("only the creator can delete an open record", () => {
@@ -28,5 +28,9 @@ describe("workflow rules", () => {
   });
   it("subcontractor certificate deducts retention and previous payments", () => {
     expect(claimCertificate({ certified_gross: 100000, retention_percent: 5, previous_certified: 20000 })).toEqual({ retention: 5000, due: 75000 });
+  });
+  it("amounts above the client threshold need client sign-off", () => {
+    expect(needsClientApproval(5001, 5000)).toBe(true);
+    expect(needsClientApproval(5000, 5000)).toBe(false);
   });
 });

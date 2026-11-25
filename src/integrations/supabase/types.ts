@@ -323,6 +323,69 @@ export type Database = {
           },
         ]
       }
+      extra_work_quotes: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          decided_note: string | null
+          description: string
+          id: string
+          photo_url: string | null
+          project_id: string
+          quote_number: string
+          status: string
+          subcontractor_id: string
+          updated_at: string
+          variation_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          decided_note?: string | null
+          description: string
+          id?: string
+          photo_url?: string | null
+          project_id: string
+          quote_number: string
+          status?: string
+          subcontractor_id: string
+          updated_at?: string
+          variation_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          decided_note?: string | null
+          description?: string
+          id?: string
+          photo_url?: string | null
+          project_id?: string
+          quote_number?: string
+          status?: string
+          subcontractor_id?: string
+          updated_at?: string
+          variation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "extra_work_quotes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "extra_work_quotes_subcontractor_id_fkey"
+            columns: ["subcontractor_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_applications: {
         Row: {
           application_number: number
@@ -484,8 +547,11 @@ export type Database = {
       }
       projects: {
         Row: {
+          client_approval_threshold: number
           created_at: string
+          created_by: string | null
           currency: string
+          default_retention_percent: number
           employer_name: string | null
           id: string
           latitude: number | null
@@ -498,12 +564,16 @@ export type Database = {
           project_number: string
           revised_contract_sum: number | null
           site_address: string | null
+          sponsor_sub_passes: boolean
           status: string
           updated_at: string
         }
         Insert: {
+          client_approval_threshold?: number
           created_at?: string
+          created_by?: string | null
           currency?: string
+          default_retention_percent?: number
           employer_name?: string | null
           id?: string
           latitude?: number | null
@@ -516,12 +586,16 @@ export type Database = {
           project_number: string
           revised_contract_sum?: number | null
           site_address?: string | null
+          sponsor_sub_passes?: boolean
           status?: string
           updated_at?: string
         }
         Update: {
+          client_approval_threshold?: number
           created_at?: string
+          created_by?: string | null
           currency?: string
+          default_retention_percent?: number
           employer_name?: string | null
           id?: string
           latitude?: number | null
@@ -534,6 +608,7 @@ export type Database = {
           project_number?: string
           revised_contract_sum?: number | null
           site_address?: string | null
+          sponsor_sub_passes?: boolean
           status?: string
           updated_at?: string
         }
@@ -1138,6 +1213,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      suppliers: {
+        Row: {
+          company_name: string
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          notes: string | null
+          phone: string | null
+          preferred: boolean
+          rating: number
+          trade: string
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          preferred?: boolean
+          rating?: number
+          trade: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          preferred?: boolean
+          rating?: number
+          trade?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       trade_packages: {
         Row: {

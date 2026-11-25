@@ -34,3 +34,5 @@ use the editor.
 - Construction workflow rules (who may delete, numbering, inspection result, compliance expiry, sub-claim certificate) live in `src/lib/workflow.ts` (tested); records are deletable only by their creator while still open, otherwise resolved with photo evidence via `components/fb/Workflow.tsx`.
 - The Live QA Hub (`/qa-hub`) is owner-only (RLS via `public.is_superadmin()`); its test cases live in `src/lib/qa-cases.ts` — add a case when adding a workflow.
 - Project data access is limited to `public.project_members`; approvals/sign-offs (certify, approve, resolve, sign) are manager-only, enforced by the `enforce_manager_signoff` DB trigger, so UI buttons are convenience only.
+- The active project lives in `PROJECT_ID` (live binding in `src/lib/db.ts`, persisted in localStorage; switching reloads); `useTable` auto-scopes project_id tables, so new project tables must be added to `PROJECT_SCOPED`.
+- App navigation is grouped hubs in `AppShell.tsx` (`HUBS`), filtered by the selected workspace view; add new pages to a hub there.
