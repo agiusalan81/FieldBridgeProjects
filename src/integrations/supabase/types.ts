@@ -323,6 +323,53 @@ export type Database = {
           },
         ]
       }
+      estimate_lines: {
+        Row: {
+          budget: number
+          committed: number
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          project_id: string
+          section: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          budget?: number
+          committed?: number
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          project_id: string
+          section: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          budget?: number
+          committed?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          project_id?: string
+          section?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       extra_work_quotes: {
         Row: {
           amount: number
@@ -485,6 +532,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          invited_by: string | null
+          job_title: string | null
+          role: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string | null
+          job_title?: string | null
+          role?: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string | null
+          job_title?: string | null
+          role?: string
+          status?: string
+        }
+        Relationships: []
       }
       project_levels_zones: {
         Row: {
@@ -737,6 +820,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      signup_profiles: {
+        Row: {
+          company_name: string
+          created_at: string
+          email: string
+          first_name: string
+          job_role: string | null
+          last_name: string
+          organisation_type: string | null
+          phone: string | null
+          problems: string[]
+          reason: string | null
+          team_size: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          email: string
+          first_name: string
+          job_role?: string | null
+          last_name: string
+          organisation_type?: string | null
+          phone?: string | null
+          problems?: string[]
+          reason?: string | null
+          team_size?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          job_role?: string | null
+          last_name?: string
+          organisation_type?: string | null
+          phone?: string | null
+          problems?: string[]
+          reason?: string | null
+          team_size?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       site_inspections: {
         Row: {
@@ -1367,6 +1498,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_invites: { Args: never; Returns: number }
       is_project_manager: { Args: never; Returns: boolean }
       is_project_member: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
