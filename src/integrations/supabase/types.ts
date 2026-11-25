@@ -461,6 +461,27 @@ export type Database = {
           },
         ]
       }
+      project_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
@@ -1226,6 +1247,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      is_project_manager: { Args: never; Returns: boolean }
+      is_project_member: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
     }
     Enums: {
