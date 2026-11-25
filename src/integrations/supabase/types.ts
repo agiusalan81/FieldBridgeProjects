@@ -73,6 +73,7 @@ export type Database = {
       daywork_sheets: {
         Row: {
           created_at: string
+          created_by: string | null
           description: string
           id: string
           labour_hours: number
@@ -87,10 +88,12 @@ export type Database = {
           status: string
           subcontractor_id: string | null
           updated_at: string
+          variation_id: string | null
           work_date: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           description: string
           id?: string
           labour_hours?: number
@@ -105,10 +108,12 @@ export type Database = {
           status?: string
           subcontractor_id?: string | null
           updated_at?: string
+          variation_id?: string | null
           work_date?: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           description?: string
           id?: string
           labour_hours?: number
@@ -123,6 +128,7 @@ export type Database = {
           status?: string
           subcontractor_id?: string | null
           updated_at?: string
+          variation_id?: string | null
           work_date?: string
         }
         Relationships: [
@@ -144,37 +150,61 @@ export type Database = {
       }
       drawing_pins: {
         Row: {
+          corrective_action: string | null
           created_at: string
+          created_by: string | null
           drawing_id: string
+          hazard_category: string | null
           id: string
           note: string | null
+          photo_url: string | null
           pin_type: string
           reference_id: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_photo_url: string | null
           revision_id: string | null
+          severity: string | null
           status: string
           x_percent: number
           y_percent: number
         }
         Insert: {
+          corrective_action?: string | null
           created_at?: string
+          created_by?: string | null
           drawing_id: string
+          hazard_category?: string | null
           id?: string
           note?: string | null
+          photo_url?: string | null
           pin_type: string
           reference_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_photo_url?: string | null
           revision_id?: string | null
+          severity?: string | null
           status?: string
           x_percent: number
           y_percent: number
         }
         Update: {
+          corrective_action?: string | null
           created_at?: string
+          created_by?: string | null
           drawing_id?: string
+          hazard_category?: string | null
           id?: string
           note?: string | null
+          photo_url?: string | null
           pin_type?: string
           reference_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_photo_url?: string | null
           revision_id?: string | null
+          severity?: string | null
           status?: string
           x_percent?: number
           y_percent?: number
@@ -240,6 +270,7 @@ export type Database = {
       drawings: {
         Row: {
           created_at: string
+          created_by: string | null
           current_revision: string
           discipline: string
           drawing_url: string | null
@@ -254,6 +285,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           current_revision?: string
           discipline: string
           drawing_url?: string | null
@@ -268,6 +300,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           current_revision?: string
           discipline?: string
           drawing_url?: string | null
@@ -485,11 +518,42 @@ export type Database = {
         }
         Relationships: []
       }
+      qa_test_results: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          test_code: string
+          tested_at: string | null
+          updated_at: string
+          verdict: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          test_code: string
+          tested_at?: string | null
+          updated_at?: string
+          verdict?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          test_code?: string
+          tested_at?: string | null
+          updated_at?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
       rfis: {
         Row: {
           assigned_consultant: string | null
           cost_impact: string | null
           created_at: string
+          created_by: string | null
           date_raised: string
           date_required: string | null
           discipline: string | null
@@ -506,11 +570,13 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          variation_id: string | null
         }
         Insert: {
           assigned_consultant?: string | null
           cost_impact?: string | null
           created_at?: string
+          created_by?: string | null
           date_raised?: string
           date_required?: string | null
           discipline?: string | null
@@ -527,11 +593,13 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          variation_id?: string | null
         }
         Update: {
           assigned_consultant?: string | null
           cost_impact?: string | null
           created_at?: string
+          created_by?: string | null
           date_raised?: string
           date_required?: string | null
           discipline?: string | null
@@ -548,6 +616,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          variation_id?: string | null
         }
         Relationships: [
           {
@@ -573,9 +642,80 @@ export type Database = {
           },
         ]
       }
+      site_inspections: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          inspected_at: string | null
+          inspection_number: string
+          inspector: string | null
+          items: Json
+          level_zone_id: string | null
+          package_id: string | null
+          project_id: string
+          result: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspected_at?: string | null
+          inspection_number: string
+          inspector?: string | null
+          items?: Json
+          level_zone_id?: string | null
+          package_id?: string | null
+          project_id: string
+          result?: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          inspected_at?: string | null
+          inspection_number?: string
+          inspector?: string | null
+          items?: Json
+          level_zone_id?: string | null
+          package_id?: string | null
+          project_id?: string
+          result?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_inspections_level_zone_id_fkey"
+            columns: ["level_zone_id"]
+            isOneToOne: false
+            referencedRelation: "project_levels_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_inspections_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "trade_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "site_inspections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       snags: {
         Row: {
           created_at: string
+          created_by: string | null
           defect_description: string
           drawing_id: string | null
           gridline_ref: string | null
@@ -596,6 +736,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           defect_description: string
           drawing_id?: string | null
           gridline_ref?: string | null
@@ -616,6 +757,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           defect_description?: string
           drawing_id?: string | null
           gridline_ref?: string | null
@@ -665,6 +807,116 @@ export type Database = {
           },
           {
             foreignKeyName: "snags_subcontractor_id_fkey"
+            columns: ["subcontractor_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcontractor_claims: {
+        Row: {
+          books_sync_status: string
+          certified_gross: number | null
+          claim_number: number
+          claimed_gross: number
+          created_at: string
+          created_by: string | null
+          id: string
+          period_end: string
+          previous_certified: number
+          project_id: string
+          qs_notes: string | null
+          retention_percent: number
+          status: string
+          subcontractor_id: string
+          updated_at: string
+        }
+        Insert: {
+          books_sync_status?: string
+          certified_gross?: number | null
+          claim_number: number
+          claimed_gross?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          period_end: string
+          previous_certified?: number
+          project_id: string
+          qs_notes?: string | null
+          retention_percent?: number
+          status?: string
+          subcontractor_id: string
+          updated_at?: string
+        }
+        Update: {
+          books_sync_status?: string
+          certified_gross?: number | null
+          claim_number?: number
+          claimed_gross?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          period_end?: string
+          previous_certified?: number
+          project_id?: string
+          qs_notes?: string | null
+          retention_percent?: number
+          status?: string
+          subcontractor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcontractor_claims_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subcontractor_claims_subcontractor_id_fkey"
+            columns: ["subcontractor_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcontractor_compliance: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          doc_type: string
+          expiry_date: string | null
+          id: string
+          reference: string | null
+          subcontractor_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          doc_type: string
+          expiry_date?: string | null
+          id?: string
+          reference?: string | null
+          subcontractor_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          doc_type?: string
+          expiry_date?: string | null
+          id?: string
+          reference?: string | null
+          subcontractor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcontractor_compliance_subcontractor_id_fkey"
             columns: ["subcontractor_id"]
             isOneToOne: false
             referencedRelation: "subcontractors"
@@ -800,6 +1052,72 @@ export type Database = {
           },
         ]
       }
+      submittals: {
+        Row: {
+          approver: string | null
+          approver_notes: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          package_id: string | null
+          project_id: string
+          spec_section: string | null
+          status: string
+          submittal_number: string
+          submitted_by: string | null
+          target_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approver?: string | null
+          approver_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          package_id?: string | null
+          project_id: string
+          spec_section?: string | null
+          status?: string
+          submittal_number: string
+          submitted_by?: string | null
+          target_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approver?: string | null
+          approver_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          package_id?: string | null
+          project_id?: string
+          spec_section?: string | null
+          status?: string
+          submittal_number?: string
+          submitted_by?: string | null
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submittals_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "trade_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submittals_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_packages: {
         Row: {
           created_at: string
@@ -840,12 +1158,15 @@ export type Database = {
           approved_employer_amount: number | null
           claimed_contractor_amount: number | null
           created_at: string
+          created_by: string | null
           eot_days_claimed: number | null
           eot_days_granted: number | null
           id: string
           instruction_source: string | null
           project_id: string
           scope_description: string | null
+          source_id: string | null
+          source_type: string | null
           status: string
           subcontractor_quotation: number | null
           title: string
@@ -856,12 +1177,15 @@ export type Database = {
           approved_employer_amount?: number | null
           claimed_contractor_amount?: number | null
           created_at?: string
+          created_by?: string | null
           eot_days_claimed?: number | null
           eot_days_granted?: number | null
           id?: string
           instruction_source?: string | null
           project_id: string
           scope_description?: string | null
+          source_id?: string | null
+          source_type?: string | null
           status?: string
           subcontractor_quotation?: number | null
           title: string
@@ -872,12 +1196,15 @@ export type Database = {
           approved_employer_amount?: number | null
           claimed_contractor_amount?: number | null
           created_at?: string
+          created_by?: string | null
           eot_days_claimed?: number | null
           eot_days_granted?: number | null
           id?: string
           instruction_source?: string | null
           project_id?: string
           scope_description?: string | null
+          source_id?: string | null
+          source_type?: string | null
           status?: string
           subcontractor_quotation?: number | null
           title?: string
@@ -899,7 +1226,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_superadmin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
