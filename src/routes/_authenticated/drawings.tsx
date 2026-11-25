@@ -18,6 +18,8 @@ import { DeleteMistake, ResolveWithPhoto } from "@/components/fb/Workflow";
 import { photoToDataUrl } from "@/lib/photo";
 import { PhotoPicker } from "@/components/fb/PhotoPicker";
 import { PROJECT_ID } from "@/lib/db";
+import { saveSiteRecord } from "@/lib/offline";
+import { nextNumber } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/drawings")({
   head: () => pageHead("Drawing Register", "Construction issue drawings by discipline with pan/zoom viewer, pin drops and revision comparison."),
@@ -54,8 +56,8 @@ function Drawings() {
   const revs = revisions.data?.filter((r) => r.drawing_id === sel?.id) ?? [];
 
   async function onClick(e: React.MouseEvent) {
-    if (!sel || mode === "pan" || drag.current?.moved) return;
-    const r = sheetRef.current!.getBoundingClientRect();
+    if (!sel || mode === "pan" || drag.current?.moved || !sheetRef.current) return;
+    const r = sheetRef.current.getBoundingClientRect();
     const x = +(((e.clientX - r.left) / r.width) * 100).toFixed(1);
     const y = +(((e.clientY - r.top) / r.height) * 100).toFixed(1);
     if (mode === "rfi" || mode === "snag") return setCreate({ kind: mode, x, y });
@@ -64,7 +66,8 @@ function Drawings() {
 
   return (
     <>
-      <PageTitle title="Drawing & Specification Register" sub="Construction issue sheets · click a plan to anchor an RFI, snag or safety observation"><Button onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" />Add drawing</Button></PageTitle>
+      <PageTitle title="Drawing & Specification Register" sub="Construction issue sheets"><Button onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" />Add drawing</Button></PageTitle>
+      {drawings.error && <p role="alert" className="mb-3 text-sm text-destructive">{drawings.error.message}</p>}
       <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
         <aside className="space-y-4">
           {Object.entries(grouped).map(([disc, list]) => (
@@ -94,7 +97,7 @@ function Drawings() {
               <Button size="icon" variant="outline" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(0.5, z - 0.25))}><ZoomOut className="h-4 w-4" /></Button>
               <Button size="icon" variant="outline" aria-label="Reset view" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}><Maximize className="h-4 w-4" /></Button>
               <Button size="sm" variant={compare ? "default" : "outline"} onClick={() => setCompare((c) => !c)} disabled={revs.length < 2}>
-                <GitCompare className="h-4 w-4" />{revs.length >= 2 ? `Compare ${revs[1]!.revision_code} → ${revs[0]!.revision_code}` : "No prior rev"}
+                <GitCompare className="h-4 w-4" />{revs.length >= 2 ? `Compare ${revs[1]?.revision_code} → ${revs[0]?.revision_code}` : "No prior rev"}
               </Button>
             </div>
             <div className="relative h-[60vh] overflow-hidden rounded-md border-2 border-shell bg-muted touch-none"
@@ -111,7 +114,7 @@ function Drawings() {
                       onClick={(e) => { e.stopPropagation(); setPinId(p.id); }}
                       className={`group absolute -translate-x-1/2 -translate-y-full cursor-pointer ${p.status === "Resolved" ? "opacity-50" : ""}`} style={{ left: `${p.x_percent}%`, top: `${p.y_percent}%` }}>
                       <div className={`flex h-7 min-w-7 items-center justify-center rounded-full rounded-bl-none border-2 border-card px-1 text-[10px] font-bold text-success-foreground shadow ${pinColor[p.pin_type]}`}>
-                        {p.reference_id?.split("-")[1] ?? "!"}
+                        {p._offline ? "↥" : p.reference_id?.split("-")[1] ?? "!"}
                       </div>
                       <div className="pointer-events-none absolute left-8 top-0 z-10 hidden w-48 rounded bg-shell p-2 text-xs text-shell-foreground group-hover:block">
                         <b>{pinLabel[p.pin_type]} {p.reference_id}</b><br />{p.note}
@@ -147,20 +150,23 @@ const SEVERITIES = ["Stop Work", "Urgent", "Advisory"];
 function HazardDialog({ drawing, spot, onClose }: { drawing: Row; spot: { type: "observation" | "safety_hazard"; x: number; y: number }; onClose: () => void }) {
   const refresh = useRefresh();
   const isHaz = spot.type === "safety_hazard";
-  const [f, setF] = useState({ cat: HAZARD_CATS[0]!, sev: isHaz ? "Urgent" : "Advisory", note: "", action: "" });
+  const [f, setF] = useState({ cat: HAZARD_CATS[0] ?? "Other", sev: isHaz ? "Urgent" : "Advisory", note: "", action: "" });
   const [photo, setPhoto] = useState<string>();
+  const pins = useTable("drawing_pins");
+  const [saving, setSaving] = useState(false);
   async function save() {
     if (!f.note.trim()) { toast.error("Describe what you saw"); return; }
-    const { data: ex } = await db.from("drawing_pins").select("reference_id").eq("pin_type", spot.type);
-    const prefix = isHaz ? "HAZ" : "OBS";
-    const n = Math.max(0, ...(ex ?? []).map((r: Row) => parseInt(String(r.reference_id ?? "").split("-")[1] ?? "0", 10) || 0)) + 1;
-    const { error } = await db.from("drawing_pins").insert({ drawing_id: drawing.id, pin_type: spot.type, x_percent: spot.x, y_percent: spot.y, reference_id: `${prefix}-${String(n).padStart(3, "0")}`,
-      note: f.note, hazard_category: isHaz ? f.cat : null, severity: f.sev, corrective_action: f.action || null, photo_url: photo ?? null, status: "Open" });
-    if (error) { toast.error(error.message); return; }
-    toast.success(`${pinLabel[spot.type]} logged on ${drawing.sheet_number}`); refresh("drawing_pins"); onClose();
+    setSaving(true);
+    try {
+      const ref = nextNumber(isHaz ? "HAZ" : "OBS", (pins.data ?? []).filter((p) => p.drawing_id === drawing.id && p.pin_type === spot.type).map((p) => p.reference_id));
+      const result = await saveSiteRecord(PROJECT_ID, [{ table: "drawing_pins", row: { drawing_id: drawing.id, pin_type: spot.type, x_percent: spot.x, y_percent: spot.y, reference_id: ref, note: f.note, hazard_category: isHaz ? f.cat : null, severity: f.sev, corrective_action: f.action || null, photo_url: photo ?? null, status: "Open" } }]);
+      toast.success(result.queued ? "Pin and photo saved on this device · awaiting sync" : `${pinLabel[spot.type]} logged on ${drawing.sheet_number}`);
+      refresh("drawing_pins"); onClose();
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Could not save. Your entries are still here."); }
+    finally { setSaving(false); }
   }
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
+    <Dialog open onOpenChange={(o) => !o && !saving && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle className="font-display uppercase">{isHaz ? "Log safety hazard" : "Log observation"} · {drawing.sheet_number}</DialogTitle></DialogHeader>
         {isHaz && <label className="text-sm">Hazard type<select className="mt-1 h-9 w-full rounded-md border bg-background px-2" value={f.cat} onChange={(e) => setF({ ...f, cat: e.target.value })}>{HAZARD_CATS.map((c) => <option key={c}>{c}</option>)}</select></label>}
@@ -168,7 +174,7 @@ function HazardDialog({ drawing, spot, onClose }: { drawing: Row; spot: { type: 
         <Textarea placeholder="What is the hazard / observation?" value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} />
         <Textarea placeholder="Immediate corrective action required" value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} />
         <div className="text-sm">Photo (optional)<PhotoPicker value={photo} onChange={setPhoto} /></div>
-        <Button onClick={save}>Save pin</Button>
+        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save pin"}</Button>
       </DialogContent>
     </Dialog>
   );
@@ -182,12 +188,12 @@ function PinInspector({ pin, onClose }: { pin?: Row; onClose: () => void }) {
         {pin && (<>
           <SheetHeader><SheetTitle className="font-display text-2xl uppercase">{pinLabel[pin.pin_type]} {pin.reference_id ?? ""}</SheetTitle></SheetHeader>
           <div className="space-y-3 px-4 pb-6 text-sm">
-            <div className="flex flex-wrap gap-2"><StatusBadge value={pin.status} />{pin.severity && <StatusBadge value={pin.severity} />}{pin.hazard_category && <StatusBadge value={pin.hazard_category} />}</div>
+            <div className="flex flex-wrap gap-2"><StatusBadge value={pin.status} />{pin._offline && <span className="text-xs text-muted-foreground">{pin._offline}</span>}{pin.severity && <StatusBadge value={pin.severity} />}{pin.hazard_category && <StatusBadge value={pin.hazard_category} />}</div>
             <p>{pin.note}</p>
             {pin.corrective_action && <p><b>Corrective action:</b> {pin.corrective_action}</p>}
             {pin.photo_url && <img src={pin.photo_url} alt="As found" className="rounded" />}
             <p className="text-xs text-muted-foreground">Logged {new Date(pin.created_at).toLocaleString()}</p>
-            {pin.status === "Resolved" ? (
+            {!pin._offline && (pin.status === "Resolved" ? (
               <div className="rounded-md border-2 border-success p-3"><b>Resolved</b> {pin.resolved_at && new Date(pin.resolved_at).toLocaleDateString()}<p>{pin.resolution_note}</p>{pin.resolved_photo_url && <img src={pin.resolved_photo_url} alt="Resolution evidence" className="mt-2 rounded" />}</div>
             ) : ["rfi", "snag"].includes(pin.pin_type) ? <p className="text-muted-foreground">Manage this item from its {pin.pin_type === "rfi" ? "RFI" : "Snagging"} register.</p> : (
               <ResolveWithPhoto onResolve={async (photo, note) => {
@@ -195,8 +201,8 @@ function PinInspector({ pin, onClose }: { pin?: Row; onClose: () => void }) {
                 if (error) { toast.error(error.message); return; }
                 toast.success("Marked resolved"); refresh("drawing_pins");
               }} />
-            )}
-            <DeleteMistake table="drawing_pins" row={pin} label={`pin ${pin.reference_id ?? ""}`} onDone={onClose} />
+            ))}
+            {!pin._offline && <DeleteMistake table="drawing_pins" row={pin} label={`pin ${pin.reference_id ?? ""}`} onDone={onClose} />}
           </div>
         </>)}
       </SheetContent>
@@ -209,7 +215,7 @@ const DISCIPLINES = ["Architectural", "Structural", "MEP - Mechanical", "MEP - E
 function AddDrawing({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (o: boolean) => void; onCreated: (id: string) => void }) {
   const refresh = useRefresh();
   const levels = useTable("project_levels_zones", { order: "sequence_order" });
-  const [f, setF] = useState({ discipline: DISCIPLINES[0]!, sheet_number: "", sheet_title: "", level_code: "", rev: "P01", reason: "First issue" });
+  const [f, setF] = useState({ discipline: DISCIPLINES[0] ?? "Architectural", sheet_number: "", sheet_title: "", level_code: "", rev: "P01", reason: "First issue" });
   const [file, setFile] = useState<string>();
   const [pdf, setPdf] = useState<{ file: File; pages: number; page: number } | null>(null);
   const [busy, setBusy] = useState(false);

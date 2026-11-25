@@ -42,3 +42,7 @@ use the editor.
 - Estimate rollups live in `src/lib/estimate.ts` (tested); payment certificates are printable views over `valuation()`, so no separate certificate data exists.
 - Remote sign-off links (`/sign/$token`, public) read and sign only through server functions in `src/lib/signoff.functions.ts`, which validate the token and open/expiry rule from `src/lib/signoff.ts` (tested); the token is never exposed to anon RLS. Remote signatures are recorded on `signoff_requests`, not copied onto the item, so the manager sign-off trigger stays authoritative.
 - PDF drawings are rasterised client-side per page (`src/lib/pdf.ts`, lazy pdfjs import) and stored as the sheet image, so the viewer and pins handle one image format.
+- Offline site creations use a user/project-scoped IndexedDB outbox with stable UUIDs and dependent-write cursors; server RLS remains authoritative and sign-offs never queue, preventing duplicate replay and offline privilege escalation.
+- Table read caches share the outbox's user/project isolation; offline opening uses a previously confirmed local identity (not a bearer token), cleared with read caches on sign-out; replay always revalidates Auth, so expired tokens cannot grant server access.
+- App-shell caching uses generateSW with NetworkFirst navigation and a single preview-guarded registrar; OAuth, API and remote-signature pages are excluded to avoid stale secure responses.
+- RFI creation location comes from the shared pin-location rule; pinned records never submit gridline text, keeping register and drawing creation consistent.

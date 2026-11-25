@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { readCachedTable } from "./offline";
 
 // Untyped handle: generated types may lag behind the schema.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +26,9 @@ const PROJECT_SCOPED = new Set(["daily_site_diaries", "daywork_sheets", "drawing
 export function useTable(table: string, opts: { order?: string; asc?: boolean; filter?: [string, string] } = {}) {
   return useQuery<Row[]>({
     queryKey: [table, opts, PROJECT_SCOPED.has(table) ? PROJECT_ID : null],
+    networkMode: "always",
     queryFn: async () => {
+      const rows = await readCachedTable(table, PROJECT_ID, opts, async () => {
       let q = db.from(table).select("*");
       if (PROJECT_SCOPED.has(table)) q = q.eq("project_id", PROJECT_ID);
       if (opts.filter) q = q.eq(opts.filter[0], opts.filter[1]);
@@ -33,6 +36,8 @@ export function useTable(table: string, opts: { order?: string; asc?: boolean; f
       const { data, error } = await q;
       if (error) throw error;
       return data ?? [];
+      });
+      return opts.filter ? rows.filter((r) => r[opts.filter?.[0] ?? ""] === opts.filter?.[1]) : rows;
     },
   });
 }

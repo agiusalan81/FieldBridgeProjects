@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "./Workflow";
 import { db, PROJECT_ID, setActiveProject, useTable } from "@/lib/db";
 import { initializeAccountAccess } from "@/lib/account-access";
+import { hasLocalAccess, isDisconnected, rememberAccess } from "@/lib/offline";
+import { OfflineStatus } from "./OfflineStatus";
 
 type Item = { to: string; label: string; icon: typeof Layers };
 const HUBS: { hub: string; roles: string[]; items: Item[] }[] = [
@@ -62,11 +64,17 @@ export function AppShell({ children }: { children: ReactNode }) {
     setAccessError(undefined);
     void (async () => {
       try {
-        await syncOnboarding();
+        if (isDisconnected()) {
+          if (!await hasLocalAccess(PROJECT_ID)) throw new Error("Project not saved on this device");
+        } else {
+          await syncOnboarding();
+          await rememberAccess(PROJECT_ID);
+          void navigator.storage?.persist().catch(() => false);
+        }
         await queryClient.invalidateQueries();
         if (!cancelled) setAccessReady(true);
       } catch {
-        if (!cancelled) setAccessError("We couldn't confirm your project access. Please try again.");
+        if (!cancelled) setAccessError(isDisconnected() ? "Open this project with a connection first to make it available on this device." : "We couldn't confirm your project access. Please try again.");
       }
     })();
     return () => { cancelled = true; };
@@ -111,7 +119,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </SelectContent>
           </Select>
           <div className="ml-auto flex items-center gap-2">
-            <span className={`hidden items-center gap-1 rounded-sm px-2 py-1 text-[11px] font-semibold uppercase sm:flex ${online ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
+            <span className={`flex items-center gap-1 rounded-sm px-2 py-1 text-[11px] font-semibold uppercase ${online ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}>
               {online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}{online ? "Online" : "Offline"}
             </span>
             <Select value={role} onValueChange={(r) => { setRole(r); localStorage.setItem("fbp.role", r); }}>
@@ -124,6 +132,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => supabase.auth.signOut()}><LogOut className="h-4 w-4" /></Button>
           </div>
         </div>
+        <OfflineStatus online={online} />
       </header>
       <div className="flex">
         <aside className="sticky top-[60px] hidden h-[calc(100vh-60px)] w-60 shrink-0 overflow-y-auto border-r bg-shell text-shell-foreground md:block">{nav}</aside>

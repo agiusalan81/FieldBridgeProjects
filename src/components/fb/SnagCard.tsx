@@ -30,14 +30,15 @@ export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string;
         <p className="text-sm">{s.defect_description}</p>
         <div className="text-xs text-muted-foreground">{level} · {s.gridline_ref} · {pkg}</div>
         <div className="flex items-center justify-between"><StatusBadge value={s.status} /><span className={`text-xs ${overdue ? "font-bold text-destructive" : "text-muted-foreground"}`}>Rectify by {s.rectify_by_date}</span></div>
-        {s.status === "Open" && (
+        {s._offline && <p className="text-xs text-muted-foreground">{s._offline}</p>}
+        {!s._offline && s.status === "Open" && (
           <div className="space-y-1">
             <div className="text-xs font-bold uppercase text-muted-foreground">Upload fixed photo & mark rectified</div>
             <PhotoPicker onChange={(p) => p && update({ photo_rectified_url: p, status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`)} />
           </div>
         )}
-        <ItemChat itemType="snag" itemId={s.id} label={s.snag_number} /><DeleteMistake table="snags" row={s} label={s.snag_number} />
-        {canVerify && s.status === "Fixed - Awaiting Re-inspection" && (
+        {!s._offline && <><ItemChat itemType="snag" itemId={s.id} label={s.snag_number} /><DeleteMistake table="snags" row={s} label={s.snag_number} /></>}
+        {!s._offline && canVerify && s.status === "Fixed - Awaiting Re-inspection" && (
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" className="h-11" disabled={busy} onClick={() => update({ status: "Open" }, "Rejected — reopened")}>Reject</Button>
             <Button className="h-11 bg-success text-success-foreground hover:bg-success/90" disabled={busy} onClick={() => update({ status: "Verified & Closed" }, `${s.snag_number} verified & closed`)}><CheckCircle2 className="h-4 w-4" />Verify & Close</Button>
