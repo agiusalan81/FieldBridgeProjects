@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Camera, Trash2, ArrowRightLeft } from "lucide-react";
+import { Trash2, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { db, PROJECT_ID, useRefresh, type Row } from "@/lib/db";
 import { canDelete, nextNumber, OWNER_EMAIL } from "@/lib/workflow";
-import { safePhoto } from "@/lib/photo";
+import { PhotoPicker } from "./PhotoPicker";
 
 export function useMe() {
   const [me, setMe] = useState<{ id?: string | undefined; email?: string | undefined; isOwner: boolean }>({ isOwner: false });
@@ -42,14 +42,12 @@ export function DeleteMistake({ table, row, label, onDone }: { table: string; ro
 
 /** Photo + note evidence capture used to formally resolve an item. */
 export function ResolveWithPhoto({ onResolve, cta = "Resolve with photo evidence" }: { onResolve: (photo: string, note: string) => Promise<void>; cta?: string }) {
-  const ref = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState<string>();
   const [note, setNote] = useState("");
   return (
     <div className="space-y-2 rounded-md border-2 border-success p-3">
       <div className="text-xs font-bold uppercase">Formal resolution</div>
-      <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => { const p = await safePhoto(e.target.files?.[0]); if (p) setPhoto(p); e.target.value = ""; }} />
-      {photo ? <img src={photo} alt="Resolution evidence" className="max-h-40 rounded" /> : <Button variant="outline" className="w-full" onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Take / upload photo</Button>}
+      <PhotoPicker value={photo} onChange={setPhoto} />
       <Textarea placeholder="What was done to resolve it?" value={note} onChange={(e) => setNote(e.target.value)} />
       <Button className="w-full" disabled={!photo || !note.trim()} onClick={() => photo && onResolve(photo, note)}>{cta}</Button>
       {!photo && <p className="text-xs text-muted-foreground">A photo is required to resolve.</p>}

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Camera, HardHat, Hammer, Bug, Receipt } from "lucide-react";
+import { HardHat, Hammer, Bug, Receipt } from "lucide-react";
 import { PageTitle } from "@/components/fb/AppShell";
 import { StatusBadge } from "@/components/fb/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { db, PROJECT_ID, useTable, useRefresh, eur, byId, type Row } from "@/lib/db";
 import { nextNumber, needsClientApproval } from "@/lib/workflow";
-import { safePhoto } from "@/lib/photo";
+import { PhotoPicker } from "@/components/fb/PhotoPicker";
 import { pageHead } from "@/lib/head";
 
 export const Route = createFileRoute("/_authenticated/sub")({
@@ -78,15 +78,13 @@ function Headcount({ sub, diaryId, onDone }: { sub: Row; diaryId?: string; onDon
 }
 
 function ExtraQuote({ sub, all, onDone }: { sub: Row; all: Row[]; onDone: () => void }) {
-  const ref = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState<string>(); const [desc, setDesc] = useState(""); const [amount, setAmount] = useState("");
   async function send() {
     const { error } = await db.from("extra_work_quotes").insert({ project_id: PROJECT_ID, subcontractor_id: sub.id, quote_number: nextNumber("EW", all.map((q) => q.quote_number)), description: desc, amount: Number(amount), photo_url: photo ?? null });
     if (error) toast.error(error.message); else { toast.success("Sent for approval — don't start until approved"); onDone(); }
   }
   return <div className="space-y-2">
-    <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => { const p = await safePhoto(e.target.files?.[0]); if (p) setPhoto(p); e.target.value = ""; }} />
-    {photo ? <img src={photo} alt="Extra work location" className="max-h-40 rounded" /> : <Button variant="outline" className="w-full" onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Photo of location</Button>}
+    <PhotoPicker value={photo} onChange={setPhoto} />
     <Textarea placeholder="e.g. 4 extra double sockets on terrace" value={desc} onChange={(e) => setDesc(e.target.value)} />
     <Input type="number" placeholder="Price €" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-12 text-lg" />
     <Button className="h-12 w-full" disabled={!desc.trim() || !Number(amount)} onClick={send}>Send for approval</Button>

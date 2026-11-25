@@ -15,7 +15,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DeleteMistake, ResolveWithPhoto } from "@/components/fb/Workflow";
-import { photoToDataUrl, safePhoto } from "@/lib/photo";
+import { photoToDataUrl } from "@/lib/photo";
+import { PhotoPicker } from "@/components/fb/PhotoPicker";
 import { PROJECT_ID } from "@/lib/db";
 
 export const Route = createFileRoute("/_authenticated/drawings")({
@@ -166,8 +167,7 @@ function HazardDialog({ drawing, spot, onClose }: { drawing: Row; spot: { type: 
         <div className="grid grid-cols-3 gap-1">{SEVERITIES.map((s) => <Button key={s} type="button" variant={f.sev === s ? (s === "Stop Work" ? "destructive" : "default") : "outline"} onClick={() => setF({ ...f, sev: s })}>{s}</Button>)}</div>
         <Textarea placeholder="What is the hazard / observation?" value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} />
         <Textarea placeholder="Immediate corrective action required" value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} />
-        <label className="text-sm">Photo (optional)<Input type="file" accept="image/*" onChange={async (e) => { const p = await safePhoto(e.target.files?.[0]); if (p) setPhoto(p); }} /></label>
-        {photo && <img src={photo} alt="Hazard" className="max-h-32 rounded" />}
+        <div className="text-sm">Photo (optional)<PhotoPicker value={photo} onChange={setPhoto} /></div>
         <Button onClick={save}>Save pin</Button>
       </DialogContent>
     </Dialog>

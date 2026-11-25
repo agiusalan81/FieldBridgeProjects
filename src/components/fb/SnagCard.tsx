@@ -1,15 +1,14 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ItemChat } from "./Collab";
-import { Camera, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./StatusBadge";
 import { db, useRefresh, type Row } from "@/lib/db";
-import { safePhoto } from "@/lib/photo";
 import { DeleteMistake } from "./Workflow";
+import { PhotoPicker } from "./PhotoPicker";
 
 export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string; pkg?: string; canVerify?: boolean }) {
-  const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const refresh = useRefresh();
   async function update(patch: Row, msg: string) {
@@ -31,11 +30,12 @@ export function SnagCard({ s, level, pkg, canVerify }: { s: Row; level?: string;
         <p className="text-sm">{s.defect_description}</p>
         <div className="text-xs text-muted-foreground">{level} · {s.gridline_ref} · {pkg}</div>
         <div className="flex items-center justify-between"><StatusBadge value={s.status} /><span className={`text-xs ${overdue ? "font-bold text-destructive" : "text-muted-foreground"}`}>Rectify by {s.rectify_by_date}</span></div>
-        <input ref={ref} type="file" accept="image/*" className="sr-only" onChange={async (e) => {
-          const p = await safePhoto(e.target.files?.[0]); e.target.value = ""; if (!p) return;
-          await update({ photo_rectified_url: p, status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`);
-        }} />
-        {s.status === "Open" && <Button className="h-11 w-full" disabled={busy} onClick={() => ref.current?.click()}><Camera className="h-4 w-4" />Upload Fixed Photo & Mark Rectified</Button>}
+        {s.status === "Open" && (
+          <div className="space-y-1">
+            <div className="text-xs font-bold uppercase text-muted-foreground">Upload fixed photo & mark rectified</div>
+            <PhotoPicker onChange={(p) => p && update({ photo_rectified_url: p, status: "Fixed - Awaiting Re-inspection" }, `${s.snag_number} marked rectified`)} />
+          </div>
+        )}
         <ItemChat itemType="snag" itemId={s.id} label={s.snag_number} /><DeleteMistake table="snags" row={s} label={s.snag_number} />
         {canVerify && s.status === "Fixed - Awaiting Re-inspection" && (
           <div className="grid grid-cols-2 gap-2">

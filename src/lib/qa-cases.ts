@@ -3,7 +3,7 @@ export const QA_CASES: QaCase[] = [
   { code: "FBP-DWG-01", module: "Drawings", title: "Add a drawing with an image", steps: "Drawings → Add drawing → fill in and upload a sheet image → it appears and opens in the viewer.", route: "/drawings" },
   { code: "FBP-DWG-02", module: "Drawings", title: "Pin opens inspector", steps: "Click any pin on a sheet → details panel opens.", route: "/drawings" },
   { code: "FBP-SAF-01", module: "Safety", title: "Log a safety hazard", steps: "Safety hazard mode → click plan → choose type, severity, description → Save.", route: "/drawings" },
-  { code: "FBP-SAF-03", module: "Safety", title: "Observation photo upload", steps: "Drawings → add observation → tap Photo → choose from gallery or camera → preview shows; bad file shows an error.", route: "/drawings" },
+  { code: "FBP-SAF-03", module: "Safety", title: "Observation photo upload", steps: "Drawings → add observation → tap Take photo (camera opens) or From gallery → preview shows with remove option; bad file shows an error.", route: "/drawings" },
   { code: "FBP-SAF-02", module: "Safety", title: "Resolve hazard needs a photo", steps: "Open hazard → Resolve button disabled until photo + note → resolve → pin fades.", route: "/drawings" },
   { code: "FBP-SAF-03", module: "Safety", title: "Delete a mistaken pin", steps: "Open a pin you created → Delete (logged in error) → confirm → gone. Not shown on resolved pins.", route: "/drawings" },
   { code: "FBP-RFI-01", module: "RFIs", title: "RFI with cost impact → variation", steps: "Open an RFI with cost impact → Convert to variation → appears as Potential in Commercials.", route: "/rfis" },
